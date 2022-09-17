@@ -1,0 +1,139 @@
+
+    1 - WHAT IS THAT ? 
+    
+    OBJParser is a complete utility to import wavefront OBJ models to WebGL applications.
+    Is very full optimized and customized fron game developments. This have more specials features
+    related witch how is loaded a model and what information is desprecated in process, for customized
+    developments.
+
+    The use of this tool is more easy. You only need make a one WebGL context and call to loadOBJFile(...) method
+    providing required information about file location and others optional params.
+
+    Example 1:
+    
+        var gl = document.createElement('canvas').getContext('webgl);
+        var parser = new OBJParser();
+        var model = parser.loadOBJFile(gl, 'models/model1folder', 'model1');
+
+    And that is everitying , you dont need more to import your OBJ file to WebGL.
+    
+    2 - HOW USE OBJParser?
+    
+    After to import a OBJParser.js script in your WebPage context. You only need make a one object 
+    instance of class OBJParser (constructor don't required params). When you need load (import) a 
+    one OBJ file only call to methood loadOBJFile(...) of before created instance. 
+    
+    This method execute a one XMLHTTPRequest (XHR) to try of get a network resource , on
+    this case your OBJ File containg one model. 
+    
+    IMPORTANT:
+    
+    1:  XHR only accept HTTP server protocols and have not cross domain politics. For that OBJParser depend totaly 
+        of the location of obj file and browser politics.
+    
+    2:  The Request is executed syncronously at MainThread but you can change this providing async param 
+        on loadOBJFile at true, and modifyng the event handler method onload and onerror of OBJParser instance.
+    
+    If during requst have not errors the model data on file is procesed and converted in usable WebGL data to renderize.
+    
+    After of model procesament is returned a one object of class OBJModel containing a model data
+    on compatible format to render with WebGL.
+
+        2.1 - WHAT IS STORED ON MODEL?
+        
+        The requireds model data stored is: 
+        
+        - vertex buffer data.
+        - index buffer data. [optional]
+        - used materials.
+        - model subgeometries descriptors.
+        - model bounds and center.
+        - used texture samplers. [optional]
+    
+        
+        2.2 - HOW USE A OBJModel?
+
+        The class OBJModel contain formated information to use in WebGL render, but to render
+        first you need prepare this. To link a model buffers with shader attribs , for that 
+        only need call prepare(...) methood providing requireds params.
+
+        Example 2:
+        
+            var gl = document.createElement('canvas').getContext('webgl);
+            var objParser = new OBJParser();
+            var objModel = objParser.loadOBJFile(gl, 'models/cube', 'cube');
+            var shader = OBJParser.OBJRenderShader(gl);
+
+            var attribs = {
+                coords: gl.getAttribLocation(shaderProgram, 'vertexCoords'),
+                normal: gl.getAttribLocation(shaderProgram, 'vertexNormal'),
+                texels: gl.getAttribLocation(shaderProgram, 'vertexTexCoords'),
+                metadata: gl.getAttribLocation(shaderProgram, 'vertexMetadata')
+            };
+        
+            objModel.prepare(gl, attribs);
+        
+        How you see the prepare method require only two parametars, a one WebGL context
+        and one object containing the shader attribs locations in the specified properties.
+        (coords, normal, texels, metadata). only 'coords' property is obligatory.
+
+        2.3 - HOW RENDER A OBJModel?
+        
+        After to prepare a OBJModel object is ready to draw on WebGL, to draw you need call
+        a draw(...) methood of this and providing a required param (the WebGL contexts).
+        
+        EXAMPLE 3:
+
+            var gl = document.createElement('canvas').getContext('webgl);
+            var objParser = new OBJParser();
+            var objModel = objParser.loadOBJFile(gl, 'models/cube', 'cube');            
+            var shader = OBJParser.OBJRenderShader(gl);
+            
+            gl.useProgram(shader);
+
+            //get shader attribs and enable
+            var attribs = {
+                coords: gl.getAttribLocation(shaderProgram, 'vertexCoords'),
+                normal: gl.getAttribLocation(shaderProgram, 'vertexNormal'),
+                texels: gl.getAttribLocation(shaderProgram, 'vertexTexCoords'),
+                metadata: gl.getAttribLocation(shaderProgram, 'vertexMetadata')
+            };
+            
+            gl.enableVertexAttribArray(attribs.coords);
+            gl.enableVertexAttribArray(attribs.normal);
+            gl.enableVertexAttribArray(attribs.texels);
+            gl.enableVertexAttribArray(attribs.metadata);
+            
+            //store materials on shader uniforms
+            for(var i = 0, length = objModel.materials.length; i < length; i++){
+                OBJParser.sendMTLMaterialToGPU(gl, shader, 'materials['+i+']', objModel.materials[i]);
+            }
+            
+            //perform canvas DOM size
+            gl.canvas.width = 300;
+            gl.canvas.height = 300;
+            document.appendChild(gl.canvas);
+            
+            //enable and define depth testing function
+            gl.enable(gl.DEPTH_TEST);
+            gl.depthFunc(gl.LEQUAL);
+
+            //set render screen size equal to canvas size
+            gl.viewport(0, 0, 300, 300);
+            
+            //clear render screen
+            gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            
+            //prepare model and draw it
+            objModel.prepare(gl, attribs);
+            objModel.draw(gl);
+
+        This is a complete functional example.
+
+    HOW PERFORM THE OBJParser ?
+
+        You can perform every features of this tool modifing it instance attribs. Now
+        is explained what is performable.
+
+        

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <script src="js/main.js"></script>
+        
+        <script src="../../js/M3D/Mat4Utils.js"></script>
+        <script src="../../js/M3D/Vec3Utils.js"></script>
+        <script src="../../js/M3D/ShaderUtils.js"></script>
+        <script src="../../js/M3D/SceneUtils.js"></script>
+        <script src="../../js/M3D/loaders/obj/OBJModelLoader.js"></script>
+        
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+            }
+
+            #selectorModel {
+                position: absolute;
+                z-index: 3;
+                left: 10%;
+                top: 10%;
+                width: 50%;
+                height: 8%;
+                font-size: 100%;
+                text-align: center;
+                
+            }
+            
+            #selectorInstances {
+                position: absolute;
+                z-index: 3;
+                left: 65%;
+                top: 10%;
+                width: 5%;
+                height: 8%;
+                font-size: 100%;
+                text-align: center;
+                
+            }
+
+            #loadButton {
+                position: absolute;
+                z-index: 3;
+                left: 75%;
+                top: 10%;
+                width: 10%;
+                height: 8%;
+                font-size: 100%;
+                text-align: center;
+                
+            }
+
+        </style>
+    </head>
+    <body onload="main();">
+        <canvas id="glCanvas" width="480" height="360"></canvas>
+        <input id="selectorModel" type="text" list="list" value="Cube">
+        <input id="selectorInstances" type="number" value="1" max="100" min="1" onchange="changeInstanceNumber();">
+        
+        <button id="loadButton" onclick="selectModel();">LOAD</button>
+        <datalist id="list">
+            <option>16G Grader</option>
+            <option>Air Baloon | 0.001</option>
+            <option>Airplane A380 | 0.001</option>
+            <option>Airplane JET | 0.01</option>
+            <option>Amaryllis City | 0.0001</option>
+            <option>Android | 0.01</option>
+            <option>Bambo House | 0.1</option>
+            <option>Battle Ship CV-EssexClass | 1 </option>
+            <option>Blender Nature Asset</option>
+            <option>Boeing 747-400 | 0.1</option>
+            <option>Car | 0.1</option>
+            <option>Car Ruins | 0.1</option>
+            <option>Castle | 0.1</option>
+            <option>Cheverolet Camaro SS | 0.5</option>
+            <option>Circuit Board | 0.5</option>
+            <option>Cube</option>
+            <option>Earth Planet | 0.01</option>
+            <option>Helicopter UH60 | 0.5</option>
+            <option>House</option>
+            <option>Intergalactic Space Ship</option>
+            <option>Jet F-15 Eagle | 0.5</option>
+            <option>LED | 0.005</option>
+            <option>Missile | 0.5</option>
+            <option>New York Brownstone | 0.01</option>
+            <option>PKM Umbreon</option>
+            <option>Samsung S9 | 0.01</option>
+            <option>Space Ship 1 | 2</option>
+            <option>Space Ship 2 | 0.1</option>
+            <option>Street Lamp | 0.5</option>
+            <option>Sun Princess Remodeled | 0.01</option>
+            <option>Tank T-90</option>
+            <option>Taxi | 0.1</option>
+            <option>Tourist Bus Open | 0.01</option>
+            <option>ToyPlane</option>
+            <option>Train Virginia Locomotive</option>
+            <option>Truck Monoplace | 0.1</option>
+            <option>Truck Semi | 0.1</option>
+            <option>Wakeboard Boat | 0.01</option>
+            <option>Wath Tower</option>
+            <option>Wolf One | 5</option>
+            <option>plane</option>
+            
+        </datalist>
+
+    </body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SARS ANIQUILATION 2020 V1.0.0</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+        
+        <style type="text/css">
+
+            * {
+                margin: 0px;
+            }
+
+            canvas {
+                position: absolute;
+                border: solid 2px black;
+            }
+
+            #webgl {
+                z-index: 0;
+            }
+
+            #gui {
+                z-index: 1;
+            }
+
+        </style>
+    </head>
+    <body onload="main();">
+        <canvas id="webgl" width="800" height="500">
+            <img src="../../img/particle1.png" id="particleSprite1" alt="particle">
+        </canvas>
+        <canvas id="gui" width="800" height="500"></canvas>
+        
+        <!-- Import utilities library -->
+        <script src="../../js/lib/Mat4Utils.js"></script>
+        <script src="../../js/lib/Vec3Utils.js"></script>
+        <script src="../../js/lib/Delayer.js"></script>
+        <script src="../../js/lib/IterableList.js"></script>
+        
+        <!-- Import FPS counter class -->
+        <script src="../../js/lib/Render/FPSCounter.js"></script>
+        
+        <!-- Import Model utilities library -->
+        <script src="../../js/lib/Shader/ShaderLoader.js"></script>
+        <script src="../../js/lib/Shader/AttributesSet.js"></script>
+        <script src="../../js/lib/Shader/UniformsSet.js"></script>
+        
+        <!-- Import Model utilities library -->
+        <script src="../../js/lib/Models/OBJModels/MTLParser.js"></script>
+        <script src="../../js/lib/Models/OBJModels/OBJParser.js"></script>
+        <script src="../../js/lib/Models/OBJModels/OBJModel.js"></script>
+        
+        <!-- Import Scene utilities library -->
+        <script src="../../js/lib/Scene/Elements/SceneElement.js"></script>
+        <script src="../../js/lib/Scene/Ligths/FocusLigth.js"></script>
+        <script src="../../js/lib/Scene/Camera/OrbitalCamera.js"></script>
+        <script src="../../js/lib/Scene/Particles/ParticlesSystem.js"></script>
+        <script src="../../js/lib/Scene/Bilboards/BilboardSprite.js"></script>
+        
+        <!-- Import Fhisic utilities library -->
+        <script src="../../js/lib/Geometry/Geometry.js"></script>
+        <script src="../../js/lib/Geometry/Entity.js"></script>
+        <script src="../../js/lib/Geometry/Sphere3D.js"></script>
+        <script src="../../js/lib/Geometry/Box3D.js"></script>
+        <script src="../../js/lib/Fisics/Animator.js"></script>
+        
+        <!-- Import GUI utilities library -->
+        <script src="../../js/lib/CVGUI/GUIComponent.js"></script>
+        <script src="../../js/lib/CVGUI/GUILayout.js"></script>
+        <script src="../../js/lib/CVGUI/GUITextBox.js"></script>
+        <script src="../../js/lib/CVGUI/GUIButton.js"></script>
+        <script src="../../js/lib/CVGUI/GUIRoundButton.js"></script>
+        <script src="../../js/lib/CVGUI/GUIProgress.js"></script>
+        <script src="../../js/lib/CVGUI/GUIFrame.js"></script>
+        
+        <!-- Import game thread scripts (USED ON SINGLE THREAD MODE) -->
+        <script src="scripts/fisics/game.js"></script>
+        <script src="scripts/fisics/user.js"></script>
+        <script src="scripts/fisics/proyectils.js"></script>
+        <script src="scripts/fisics/obstacles.js"></script>
+        <script src="scripts/fisics/potencers.js"></script>
+        
+        <!-- Import inteface script -->
+        <script src="scripts/gui/gui.js"></script>
+        
+        <!-- Import main script's -->
+        <script src="scripts/renderer.js"></script>
+        <script src="scripts/start.js"></script>
+        <script src="scripts/main.js"></script>
+
+    </body>
+</html>
