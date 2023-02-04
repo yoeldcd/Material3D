@@ -1,110 +1,217 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>TODO supply a title</title>
+        <title>Model Viewer V2.0</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+        
         <script src="js/main.js"></script>
         
-        <script src="../../js/M3D/Mat4Utils.js"></script>
-        <script src="../../js/M3D/Vec3Utils.js"></script>
-        <script src="../../js/M3D/ShaderUtils.js"></script>
-        <script src="../../js/M3D/SceneUtils.js"></script>
+        <script src="../../js/M3D/M3D.js"></script>
+        <script src="../../js/M3D/MathGL.js"></script>
+        
         <script src="../../js/M3D/loaders/obj/OBJModelLoader.js"></script>
+        <script src="../../js/M3D/loaders/stl/STLModelLoader.js"></script>
+        <script src="../../js/M3D/loaders/dae/DAEModelLoader.js"></script>
+        
+        <script src="../../js/M3D/particles/ParticleGenerator.js"></script>
         
         <style>
+
             * {
                 margin: 0;
                 padding: 0;
             }
 
-            #selectorModel {
+            canvas {
                 position: absolute;
-                z-index: 3;
-                left: 10%;
-                top: 10%;
-                width: 50%;
-                height: 8%;
-                font-size: 100%;
-                text-align: center;
-                
-            }
-            
-            #selectorInstances {
-                position: absolute;
-                z-index: 3;
-                left: 65%;
-                top: 10%;
-                width: 5%;
-                height: 8%;
-                font-size: 100%;
-                text-align: center;
-                
             }
 
-            #loadButton {
+            #glCanvas {
+                z-index: 0; 
+            }
+
+            #guiCanvas {
+                z-index: 1; 
+            }
+            
+            input, button {
                 position: absolute;
                 z-index: 3;
-                left: 75%;
+            }
+
+            #selectorModel {
+                left: 10%;
+                top: 10%;
+                width: 40%;
+                height: 8%;
+                font-size: 100%;
+                text-align: center;
+                border: 0;
+
+            }
+
+            #selectorInstances {
+                left: 55%;
                 top: 10%;
                 width: 10%;
                 height: 8%;
                 font-size: 100%;
                 text-align: center;
-                
+                border: 0;
+
             }
 
+            #loadButton {
+                left: 70%;
+                top: 10%;
+                width: 10%;
+                height: 8%;
+                font-size: 100%;
+                text-align: center;
+
+            }
+
+            #multiplyButton {
+                left: 85%;
+                top: 10%;
+                width: 10%;
+                height: 8%;
+                font-size: 100%;
+                text-align: center;
+
+            }
+
+            #cameraControl {
+                display: block;
+                position: absolute;
+                z-index: 3;
+                
+                left: 5%;
+                top: 20%;
+                width: max-content;
+                height: max-content;
+                
+                align-content: center;
+                text-align: left;
+                font-size: 100%;
+            }
+            
+            .controlLabel {
+                margin-bottom: 3%;
+            }
+            
+            .controls {
+                display: block;
+                position: relative;
+                
+                width: 80%;
+                height: 1vw;
+                
+                margin-left: 2%;
+                margin-top: 10%;
+            }
+            
+            .range {
+                width: 80%;
+                height: 10%;
+            }
+            
         </style>
     </head>
     <body onload="main();">
-        <canvas id="glCanvas" width="480" height="360"></canvas>
-        <input id="selectorModel" type="text" list="list" value="Cube">
+        <canvas id="glCanvas" width="512" height="256"></canvas>
+        <canvas id="guiCanvas" width="512" height="512"></canvas>
+        <input id="selectorModel" type="text" list="list" value="OBJ | Android">
+
+        <div id="cameraControl">
+            <p class="controlLabel">CAMERA COORDS<br>
+            <p class="controls">X:<input id="cameraX" class="range" type="range" min="-100.0" max="100.0" onchange="camera.coords.x = this.value/100 * 10;"><br>
+            <p class="controls">Y:<input id="cameraY" class="range" type="range" min="-100.0" max="100.0" onchange="camera.coords.y = this.value/100 * 10;"><br>
+            <p class="controls">Z:<input id="cameraZ" class="range" type="range" min="-100.0" max="100.0" onchange="camera.coords.z = this.value/100 * 10;"><br>
+            <p class="controls">Fv:<input id="cameraFOV" class="range" type="range" min="1" max="1000" onchange="camera.projection.fieldOfView = this.value / 10;"><br>
+            </p>
+        </div>
+
+
         <input id="selectorInstances" type="number" value="1" max="100" min="1" onchange="changeInstanceNumber();">
-        
+
         <button id="loadButton" onclick="selectModel();">LOAD</button>
+        <button id="multiplyButton" onclick="changeInstanceNumber();">UPD</button>
+
         <datalist id="list">
-            <option>16G Grader</option>
-            <option>Air Baloon | 0.001</option>
-            <option>Airplane A380 | 0.001</option>
-            <option>Airplane JET | 0.01</option>
-            <option>Amaryllis City | 0.0001</option>
-            <option>Android | 0.01</option>
-            <option>Bambo House | 0.1</option>
-            <option>Battle Ship CV-EssexClass | 1 </option>
-            <option>Blender Nature Asset</option>
-            <option>Boeing 747-400 | 0.1</option>
-            <option>Car | 0.1</option>
-            <option>Car Ruins | 0.1</option>
-            <option>Castle | 0.1</option>
-            <option>Cheverolet Camaro SS | 0.5</option>
-            <option>Circuit Board | 0.5</option>
-            <option>Cube</option>
-            <option>Earth Planet | 0.01</option>
-            <option>Helicopter UH60 | 0.5</option>
-            <option>House</option>
-            <option>Intergalactic Space Ship</option>
-            <option>Jet F-15 Eagle | 0.5</option>
-            <option>LED | 0.005</option>
-            <option>Missile | 0.5</option>
-            <option>New York Brownstone | 0.01</option>
-            <option>PKM Umbreon</option>
-            <option>Samsung S9 | 0.01</option>
-            <option>Space Ship 1 | 2</option>
-            <option>Space Ship 2 | 0.1</option>
-            <option>Street Lamp | 0.5</option>
-            <option>Sun Princess Remodeled | 0.01</option>
-            <option>Tank T-90</option>
-            <option>Taxi | 0.1</option>
-            <option>Tourist Bus Open | 0.01</option>
-            <option>ToyPlane</option>
-            <option>Train Virginia Locomotive</option>
-            <option>Truck Monoplace | 0.1</option>
-            <option>Truck Semi | 0.1</option>
-            <option>Wakeboard Boat | 0.01</option>
-            <option>Wath Tower</option>
-            <option>Wolf One | 5</option>
-            <option>plane</option>
+            <option>ASCII_STL | Cube | 1 | invertedYZ</option>
+            <option>ASCII_STL | Octocat | 0.05  | invertedYZ</option>
+            <option>ASCII_STL | Stone | 0.01  | invertedYZ</option>
+            
+            <option>BINARY_STL | Cube | 1 | invertedYZ</option>
+            <option>BINARY_STL | Octocat | 0.05 | invertedYZ</option>
+            <option>BINARY_STL | Part</option>
+            
+            <option>DAE | Cube</option>
+            
+            <option>LINEAL_PARTICLES | Fire | 5 | 3 | 0 | LOOP</option>
+            <option>LINEAL_PARTICLES | Exploit | 5 | 3 | 15 | LOOP</option>
+            <option>LINEAL_PARTICLES | Smook | 1 | 1 | 1 | LOOP</option>
+            <option>LINEAL_PARTICLES | Numbers | 4 | 4 | 7 | LOOP | N | CHANGE</option>
+            
+            <option>OBJ | 16G Grader</option>
+            <option>OBJ | Air Baloon | 0.001 | invertedYZ</option>
+            <option>OBJ | Airplane</option>
+            <option>OBJ | Airplane A380 | 0.003 | invertedYZ</option>
+            <option>OBJ | Airplane JET | 0.003 | invertedYZ</option>
+            <option>OBJ | Alpha Spaceship</option>
+            <option>OBJ | Amaryllis City | 0.0001</option>
+            <option>OBJ | Android | 0.01</option>
+            <option>OBJ | Bambo House | 0.1</option>
+            <option>OBJ | Battle Ship CV-EssexClass | 1 </option>
+            <option>OBJ | Big Truck | 1 </option>
+            <option>OBJ | Blender Nature Asset</option>
+            <option>OBJ | Boeing 747-400 | 0.1</option>
+            <option>OBJ | Car | 0.1</option>
+            <option>OBJ | Car Ruins | 0.1</option>
+            <option>OBJ | Castle | 0.1</option>
+            <option>OBJ | Castelia City | 0.00001</option>
+            <option>OBJ | Center City | 0.001</option>
+            <option>OBJ | Cheverolet Camaro SS | 0.5</option>
+            <option>OBJ | Circuit Board | 0.5</option>
+            <option>OBJ | Cube</option>
+            <option>OBJ | Earth Planet | 0.01</option>
+            <option>OBJ | Enemies Set</option>
+            <option>OBJ | Fireguard Truck | 0.001 | invertedYZ</option>
+            <option>OBJ | Helicopter UH60 | 0.3 | invertedYZ</option>
+            <option>OBJ | Intergalactic Space Ship</option>
+            <option>OBJ | IronMan | 0.01 | NONE | computeNormal</option>
+            <option>OBJ | Jet F-15 Eagle | 0.5</option>
+            <option>OBJ | LED | 0.005</option>
+            <option>OBJ | Missile | 0.5</option>
+            <option>OBJ | MRX22 Recon Flyer | 0.01</option>
+            <option>OBJ | New York Brownstone | 0.005 | invertedYZ</option>
+            <option>OBJ | PKM Umbreon</option>
+            <option>OBJ | Plane With Stones 1</option>
+            <option>OBJ | Projectiles Set</option>
+            <option>OBJ | Samsung S9 | 0.01</option>
+            <option>OBJ | Simple House 1</option>
+            <option>OBJ | Space Ship 1 | 2</option>
+            <option>OBJ | Space Ship 2 | 0.1</option>
+            <option>OBJ | Street Lamp | 0.5</option>
+            <option>OBJ | Sun Princess Remodeled | 0.01</option>
+            <option>OBJ | Tank T-90</option>
+            <option>OBJ | Taxi | 0.01 | invertedYZ</option>
+            <option>OBJ | Tourist Bus Open | 0.005 | invertedYZ | computeNormal</option>
+            <option>OBJ | ToyPlane | 0.1</option>
+            <option>OBJ | Train Virginia Locomotive</option>
+            <option>OBJ | Tropical Islands | 0.00001</option>
+            <option>OBJ | Truck Monoplace | 0.2</option>
+            <option>OBJ | Truck Semi | 0.3</option>
+            <option>OBJ | Wakeboard Boat | 0.001 | invertedYZ</option>
+            <option>OBJ | Wath Tower</option>
+            <option>OBJ | Wolf One | 5</option>
+            <option>OBJ | plane</option>
+            
+            <option>RADIAL_PARTICLES | Blue Fire | 5 | 3 | 15 | LOOP | RESIZE | CHANGE</option>
+            <option>RADIAL_PARTICLES | Snow | 1 | 1 | 1 </option>
+            <option>RADIAL_PARTICLES | Explosion | 1 | 1 | 1 </option>
             
         </datalist>
 
