@@ -1,0 +1,25 @@
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+canvas {
+    
+    position: absolute;
+    margin: 0px;
+    padding: 0px;
+    
+    width: 100%;
+    height: 100%;
+}
+
+#wglCanvas {
+    z-index: 1;
+}
+
+#guiCanvas {
+    z-index: 2;
+    
+}
+

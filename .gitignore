@@ -2,3 +2,4 @@
 
 #ignore models folder
 models
+.vscode

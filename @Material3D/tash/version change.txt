@@ -1,0 +1,333 @@
+//Scene Render Node class properties
+    ////////////////////////////////////////////////////////////////////////////
+    Scene.RenderNode = function (object) {
+
+        //node parameters
+        this.object = object || null;
+        this.id = generatedRenderNodeID++;
+        this.iterationID = 0;
+
+        //define parent nodes
+        this.parentPXPYPZ = null;
+        this.parentPXPYNZ = null;
+
+        this.parentPXNYPZ = null;
+        this.parentPXNYNZ = null;
+
+        this.parentNXPYPZ = null;
+        this.parentNXPYNZ = null;
+
+        this.parentNXNYPZ = null;
+        this.parentNXNYNZ = null;
+
+        //define children nodes
+        this.childrenPXPYPZ = null;
+        this.childrenPXPYNZ = null;
+
+        this.childrenPXNYPZ = null;
+        this.childrenPXNYNZ = null;
+
+        this.childrenNXPYPZ = null;
+        this.childrenNXPYNZ = null;
+
+        this.childrenNXNYPZ = null;
+        this.childrenNXNYNZ = null;
+
+        //ordined list links
+        this.next = null;
+        this.before = null;
+    };
+
+    Scene.RenderNode.prototype.reset = function () {
+        this.object = null;
+        this.iterationID = 0;
+
+        //delete this node reference from parents nodes on Tree
+        ////////////////////////////////////////////////////////////////
+        this.parentPXPYPZ && this.parentPXPYPZ.deleteChildren(this) && (this.parentPXPYPZ = null);
+        this.parentPXPYNZ && this.parentPXPYNZ.deleteChildren(this) && (this.parentPXPYNZ = null);
+
+        this.parentPXNYPZ && this.parentPXNYPZ.deleteChildren(this) && (this.parentPXNYPZ = null);
+        this.parentPXNYNZ && this.parentPXNYNZ.deleteChildren(this) && (this.parentPXNYNZ = null);
+
+        this.parentNXPYPZ && this.parentNXPYPZ.deleteChildren(this) && (this.parentNXPYPZ = null);
+        this.parentNXPYNZ && this.parentNXPYNZ.deleteChildren(this) && (this.parentNXPYNZ = null);
+
+        this.parentNXNYPZ && this.parentNXNYPZ.deleteChildren(this) && (this.parentNXNYPZ = null);
+        this.parentNXNYNZ && this.parentNXNYNZ.deleteChildren(this) && (this.parentNXNYNZ = null);
+        ////////////////////////////////////////////////////////////////
+
+        //delete this node reference from childrens nodes on Tree
+        ////////////////////////////////////////////////////////////////
+        this.childrenPXPYPZ && this.childrenPXPYPZ.deleteParent(this) && (this.childrenPXPYPZ = null);
+        this.childrenPXPYNZ && this.childrenPXPYNZ.deleteParent(this) && (this.childrenPXPYNZ = null);
+
+        this.childrenPXNYPZ && this.childrenPXNYPZ.deleteParent(this) && (this.childrenPXNYPZ = null);
+        this.childrenPXNYNZ && this.childrenPXNYNZ.deleteParent(this) && (this.childrenPXNYNZ = null);
+
+        this.childrenNXPYPZ && this.childrenNXPYPZ.deleteParent(this) && (this.childrenNXPYPZ = null);
+        this.childrenNXPYNZ && this.childrenNXPYNZ.deleteParent(this) && (this.childrenNXPYNZ = null);
+
+        this.childrenNXNYPZ && this.childrenNXNYPZ.deleteParent(this) && (this.childrenNXNYPZ = null);
+        this.childrenNXNYNZ && this.childrenNXNYNZ.deleteParent(this) && (this.childrenNXNYNZ = null);
+        ////////////////////////////////////////////////////////////////
+
+        //clear list reference
+        this.next = null;
+        this.before = null;
+    };
+
+    Scene.RenderNode.prototype.addParent = function (node) {
+        var coords = node.object.coords;
+        var bounds = node.object.bounds;
+
+        var x = this.object.coords.x;
+        var y = this.object.coords.y;
+        var z = this.object.coords.z;
+
+        //get avaliable octant's from node object
+        var px = (coords.x > x || bounds.rigth > x);
+        var nx = (coords.x < x || bounds.left < x);
+        var py = (coords.y > y || bounds.up > y);
+        var ny = (coords.y < y || bounds.down < y);
+        var pz = (coords.z > z || bounds.near < z);
+        var nz = (coords.z < z || bounds.far < z);
+
+        //Add parent node
+        ////////////////////////////////////////////////////////////////
+        if (px) {
+            if (py) {
+                if (pz)
+                    this.parentPXPYPZ = node;
+                if (nz)
+                    this.parentPXPYNZ = node;
+            }
+
+            if (ny) {
+                if (pz)
+                    this.parentPXNYPZ = node;
+                if (nz)
+                    this.parentPXNYNZ = node;
+            }
+        }
+
+        if (nx) {
+            if (py) {
+                if (pz)
+                    this.parentNXPYPZ = node;
+                if (nz)
+                    this.parentNXPYNZ = node;
+            }
+
+            if (ny) {
+                if (pz)
+                    this.parentNXNYPZ = node;
+                if (nz)
+                    this.parentNXNYNZ = node;
+            }
+        }
+        ////////////////////////////////////////////////////////////////
+    };
+
+    Scene.RenderNode.prototype.addChildren = function (node) {
+        var coords = node.object.coords;
+        var bounds = node.object.bounds;
+
+        var x = this.object.coords.x;
+        var y = this.object.coords.y;
+        var z = this.object.coords.z;
+
+        //get object avaliable octant's
+        var px = (coords.x > x || bounds.rigth > x);
+        var nx = (coords.x < x || bounds.left < x);
+        var py = (coords.y > y || bounds.up > y);
+        var ny = (coords.y < y || bounds.down < y);
+        var pz = (coords.z > z || bounds.near < z);
+        var nz = (coords.z < z || bounds.far < z);
+
+        //Add child node
+        ////////////////////////////////////////////////////////////////
+        if (px) {
+            if (py) {
+                if (pz)
+                    this.childrenPXPYPZ ? this.childrenPXPYPZ.addChildren(node) : (this.childrenPXPYPZ = node);
+                if (nz)
+                    this.childrenPXPYNZ ? this.childrenPXPYNZ.addChildren(node) : (this.childrenPXPYNZ = node);
+            }
+
+            if (ny) {
+                if (pz)
+                    this.childrenPXNYPZ ? this.childrenPXNYPZ.addChildren(node) : (this.childrenPXNYPZ = node);
+                if (nz)
+                    this.childrenPXNYNZ ? this.childrenPXNYNZ.addChildren(node) : (this.childrenPXNYNZ = node);
+            }
+        }
+
+        if (nx) {
+            if (py) {
+                if (pz)
+                    this.childrenNXPYPZ ? this.childrenNXPYPZ.addChildren(node) : (this.childrenNXPYPZ = node);
+                if (nz)
+                    this.childrenNXPYNZ ? this.childrenNXPYNZ.addChildren(node) : (this.childrenNXPYNZ = node);
+            }
+
+            if (ny) {
+                if (pz)
+                    this.childrenNXNYPZ ? this.childrenNXNYPZ.addChildren(node) : (this.childrenNXNYPZ = node);
+                if (nz)
+                    this.childrenNXNYNZ ? this.childrenNXNYNZ.addChildren(node) : (this.childrenNXNYNZ = node);
+            }
+        }
+        ////////////////////////////////////////////////////////////////
+
+        node.addParent(this);
+    };
+
+    Scene.RenderNode.prototype.deleteParent = function (node) {
+        this.parentPXPYPZ === node && (this.parentPXPYPZ = null);
+        this.parentPXPYNZ === node && (this.parentPXPYNZ = null);
+        this.parentPXNYPZ === node && (this.parentPXNYPZ = null);
+        this.parentPXNYNZ === node && (this.parentPXNYNZ = null);
+
+        this.parentNXPYPZ === node && (this.parentNXPYPZ = null);
+        this.parentNXPYNZ === node && (this.parentNXPYNZ = null);
+        this.parentNXNYPZ === node && (this.parentNXNYPZ = null);
+        this.parentNXNYNZ === node && (this.parentNXNYNZ = null);
+    };
+
+    Scene.RenderNode.prototype.deleteChildren = function (node) {
+        this.childrenPXPYPZ === node && (this.childrenPXPYPZ = null);
+        this.childrenPXPYNZ === node && (this.childrenPXPYNZ = null);
+        this.childrenPXNYPZ === node && (this.childrenPXNYPZ = null);
+        this.childrenPXNYNZ === node && (this.childrenPXNYNZ = null);
+
+        this.childrenNXPYPZ === node && (this.childrenNXPYPZ = null);
+        this.childrenNXPYNZ === node && (this.childrenNXPYNZ = null);
+        this.childrenNXNYPZ === node && (this.childrenNXNYPZ = null);
+        this.childrenNXNYNZ === node && (this.childrenNXNYNZ = null);
+    };
+
+    Scene.RenderNode.prototype.searchColitions = function (object, iterationID) {
+
+        object || (object = this.object);
+        iterationID || (iterationID = this.iterationID);
+
+        var node = null;
+        var coords = object.coords;
+        var bounds = object.bounds;
+
+        var x = this.object.coords.x;
+        var y = this.object.coords.y;
+        var z = this.object.coords.z;
+
+        //redefine iteration key value
+        this.iterationID = iterationID;
+
+        //get avaliable octant's from node object
+        var px = (coords.x > x || bounds.rigth > x);
+        var nx = (coords.x < x || bounds.left < x);
+        var py = (coords.y > y || bounds.up > y);
+        var ny = (coords.y < y || bounds.down < y);
+        var pz = (coords.z > z || bounds.near < z);
+        var nz = (coords.z < z || bounds.far < z);
+
+        this.object.bounds.hasColition(object.bounds);
+
+        //Search colition's on children's
+        ////////////////////////////////////////////////////////////////
+        if (px) {
+            if (py) {
+                if (pz)
+                    (node = this.cildrenPXPYPZ) && node.iterationID !== iterationID && node.searchColitions(object, iterationID);
+                if (nz)
+                    (node = this.cildrenPXPYNZ) && node.iterationID !== iterationID && node.searchColitions(object, iterationID);
+            }
+
+            if (ny) {
+                if (pz)
+                    (node = this.cildrenPXNYPZ) && node.iterationID !== iterationID && node.searchColitions(object, iterationID);
+                if (nz)
+                    (node = this.cildrenPXNYNZ) && node.iterationID !== iterationID && node.searchColitions(object, iterationID);
+            }
+        }
+
+        if (nx) {
+            if (py) {
+                if (pz)
+                    (node = this.cildrenNXPYPZ) && node.iterationID !== iterationID && node.searchColitions(object, iterationID);
+                if (nz)
+                    (node = this.cildrenNXPYNZ) && node.iterationID !== iterationID && node.searchColitions(object, iterationID);
+            }
+
+            if (ny) {
+                if (pz)
+                    (node = this.cildrenNXNYPZ) && node.iterationID !== iterationID && node.searchColitions(object, iterationID);
+                if (nz)
+                    (node = this.cildrenNXNYNZ) && node.iterationID !== iterationID && node.searchColitions(object, iterationID);
+            }
+        }
+        ////////////////////////////////////////////////////////////////
+
+        //Search colition's on parent's
+        ////////////////////////////////////////////////////////////////
+        if (px) {
+            if (py) {
+                if (pz)
+                    (node = this.parentPXPYPZ) && node.iterationID !== iterationID && node.searchColitions(object, iterationID);
+                if (nz)
+                    (node = this.parentPXPYNZ) && node.iterationID !== iterationID && node.searchColitions(object, iterationID);
+            }
+
+            if (ny) {
+                if (pz)
+                    (node = this.parentPXNYPZ) && node.iterationID !== iterationID && node.searchColitions(object, iterationID);
+                if (nz)
+                    (node = this.parentPXNYNZ) && node.iterationID !== iterationID && node.searchColitions(object, iterationID);
+            }
+        }
+
+        if (nx) {
+            if (py) {
+                if (pz)
+                    (node = this.parentNXPYPZ) && node.iterationID !== iterationID && node.searchColitions(object, iterationID);
+                if (nz)
+                    (node = this.parentNXPYNZ) && node.iterationID !== iterationID && node.searchColitions(object, iterationID);
+            }
+
+            if (ny) {
+                if (pz)
+                    (node = this.parentNXNYPZ) && node.iterationID !== iterationID && node.searchColitions(object, iterationID);
+                if (nz)
+                    (node = this.parentNXNYNZ) && node.iterationID !== iterationID && node.searchColitions(object, iterationID);
+            }
+        }
+        ////////////////////////////////////////////////////////////////
+
+
+        return object;
+    };
+
+    //Scene Map class properties
+    ////////////////////////////////////////////////////////////////////////////
+    Scene.MapTree = function (scene) {
+        this.scene = scene;
+        this.root = null;
+    };
+
+    Scene.MapTree.prototype.build = function () {
+        var iterator = this.scene.getObjects().getIterator();
+        var node = null;
+
+
+        //Build Bidirectional K Tree Map of scene
+        while (!!(node = iterator.next())) {
+            console.log(node);
+
+            if (!!this.root)
+                this.root.addChildren(node);
+            else
+                this.root = node;
+        }
+
+    };
+
