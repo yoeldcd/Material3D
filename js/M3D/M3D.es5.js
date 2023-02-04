@@ -8,23 +8,23 @@ if (!window.M3D) {
 }
 
 (function () {
-    let elementID = 0;
-    let M3Dp = {};  //private context object
+    var elementID = 0;
+    var M3Dp = {};  //private context object
 
-    let vecIn = new Float32Array(3);
-    let vecAt = new Float32Array(3);
-    let vecUp = new Float32Array(3);
-    let vecX = new Float32Array(3);
-    let vecY = new Float32Array(3);
-    let vecZ = new Float32Array(3);
+    var vecIn = new Float32Array(3);
+    var vecAt = new Float32Array(3);
+    var vecUp = new Float32Array(3);
+    var vecX = new Float32Array(3);
+    var vecY = new Float32Array(3);
+    var vecZ = new Float32Array(3);
 
-    let identityMatrix = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+    var identityMatrix = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 
     //MISCELANIOUNS MATH UTILS FUNCTIONS
     function normalizedVec3(vec, dst) {
         dst || (dst = vec);
 
-        let length = Math.sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]);
+        var length = Math.sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]);
 
         if (length !== 0) {
 
@@ -43,7 +43,7 @@ if (!window.M3D) {
         dst[1] = vec1[2] * vec2[0] - vec1[0] * vec2[2];
         dst[2] = vec1[0] * vec2[1] - vec1[1] * vec2[0];
 
-        let length = Math.sqrt(dst[0] * dst[0] + dst[1] * dst[1] + dst[2] * dst[2]);
+        var length = Math.sqrt(dst[0] * dst[0] + dst[1] * dst[1] + dst[2] * dst[2]);
         if (length !== 0) {
             dst[0] /= length;
             dst[1] /= length;
@@ -57,8 +57,8 @@ if (!window.M3D) {
     function invertMat4(matrix, dstMatrix, returnInverseTranspose) {
         dstMatrix || (dstMatrix = matrix);
 
-        let det;
-        let a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p;
+        var det;
+        var a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p;
 
         //load matrix components
         a = matrix[0];
@@ -183,12 +183,12 @@ if (!window.M3D) {
 
         return matrix;
     }
-    
+
     function perspectiveMat4(matrix, fieldOfView, ratio, znear, zfar) {
 
         fieldOfView = fieldOfView / 180 * Math.PI;
-        let fv = 1.0 / Math.tan(fieldOfView / 2);
-        let inversev = 1 / (znear - zfar);
+        var fv = 1.0 / Math.tan(fieldOfView / 2);
+        var inversev = 1 / (znear - zfar);
 
         matrix[0] = fv / ratio;
         matrix[1] = 0;
@@ -288,7 +288,7 @@ if (!window.M3D) {
     }
 
     function rotateMat4(matrix, Rx, Ry, Rz) {
-        let x, y, z, s, c;
+        var x, y, z, s, c;
 
         //Rotate around X axis
         ///////////////////////////////////////////////////
@@ -452,7 +452,7 @@ if (!window.M3D) {
 
     //MISCELANIOUS DATA FUNCTIONS
     function createUpdateablePropertyVector(object, property1, property2, property3, value1, value2, value3) {
-        let vector = new Float32Array([value1 || 0, value2 || 0, value3 || 0]);
+        var vector = new Float32Array([value1 || 0, value2 || 0, value3 || 0]);
         vector.self = object;
 
         property1 ? Object.defineProperty(vector, property1, {
@@ -531,7 +531,7 @@ if (!window.M3D) {
     }
 
     function createPropertyVector(property1, property2, property3, value1, value2, value3) {
-        let vector = new Float32Array([value1 || 0, value2 || 0, value3 || 0]);
+        var vector = new Float32Array([value1 || 0, value2 || 0, value3 || 0]);
 
         property1 ? Object.defineProperty(vector, property1, {
             configurable: false
@@ -661,7 +661,7 @@ if (!window.M3D) {
     };
 
     M3D.List.prototype.add = function (data) {
-        let node;
+        var node;
 
         if (this.size === 0) {
             //define list head
@@ -682,8 +682,8 @@ if (!window.M3D) {
 
     M3D.List.prototype.get = function (data) {
 
-        let response = null;
-        let node = this.head;
+        var response = null;
+        var node = this.head;
 
         //searh node
         while (!response && node) {
@@ -702,11 +702,11 @@ if (!window.M3D) {
 
     M3D.List.prototype.remove = function (data) {
 
-        let found = false;
-        let response = null;
+        var found = false;
+        var response = null;
 
-        let head = this.head;
-        let node = head;
+        var head = this.head;
+        var node = head;
 
         //search node
         while (!found && node) {
@@ -725,8 +725,8 @@ if (!window.M3D) {
 
     M3D.List.prototype.getByName = function (name) {
 
-        let response = null;
-        let node = this.head;
+        var response = null;
+        var node = this.head;
 
         //search node data with defined name
         while (!response && node) {
@@ -741,11 +741,11 @@ if (!window.M3D) {
 
     M3D.List.prototype.removeByName = function (name) {
 
-        let found = false;
-        let response = null;
+        var found = false;
+        var response = null;
 
-        let head = this.head;
-        let node = head;
+        var head = this.head;
+        var node = head;
 
         //search node
         while (!found && node) {
@@ -791,8 +791,8 @@ if (!window.M3D) {
         if (!node || node.list !== this)
             return node;
 
-        let before = node.before;
-        let next = node.next;
+        var before = node.before;
+        var next = node.next;
 
         if (this.head) {
 
@@ -840,7 +840,7 @@ if (!window.M3D) {
     };
 
     M3Dp.ListIterator.prototype.next = function () {
-        let node = this.iterator;
+        var node = this.iterator;
 
         if (node) {
             this.iterator = node.next;
@@ -852,7 +852,7 @@ if (!window.M3D) {
     };
 
     M3Dp.ListIterator.prototype.nextNode = function () {
-        let node = this.iterator;
+        var node = this.iterator;
 
         if (node)
             this.iterator = node.next;
@@ -971,7 +971,7 @@ if (!window.M3D) {
     };
 
     M3D.Scene.prototype.removeObject = function (src) {
-        let node;
+        var node;
 
         if (typeof src === 'string')
             src = this.objects.removeByName(src);
@@ -986,7 +986,7 @@ if (!window.M3D) {
     };
 
     M3D.Scene.prototype.removeAllObjects = function () {
-        let node, next;
+        var node, next;
 
         //remove any objects of list
         node = this.objects.head;
@@ -1006,8 +1006,8 @@ if (!window.M3D) {
     };
 
     M3D.Scene.prototype.updateObjects = function () {
-        let object;
-        let node = this.objects.head;
+        var object;
+        var node = this.objects.head;
 
         //update any objects of scene
         while (node) {
@@ -1074,7 +1074,7 @@ if (!window.M3D) {
 
     M3D.Camera.prototype.setDirection = function (x, y, z) {
 
-        let length = Math.sqrt(x * x + y * y + z * z);
+        var length = Math.sqrt(x * x + y * y + z * z);
 
         if (length !== 0) {
             //normalize direction
@@ -1094,7 +1094,7 @@ if (!window.M3D) {
     };
 
     M3D.Camera.prototype.setDirection2Object = function(obj){
-        let x, y, z, length;
+        var x, y, z, length;
 
         if(obj instanceof M3D.Object) {
             x = this.coords.x - obj.coords.x;
@@ -1161,13 +1161,13 @@ if (!window.M3D) {
 
     M3D.Camera.prototype.isObjectVisibile = function (object) {
 
-        let visible = false;
+        var visible = false;
 
         //compute object2camera difernece vector
-        let vx = object.coords[0] - this.coords[0];
-        let vy = object.coords[1] - this.coords[1];
-        let vz = object.coords[2] - this.coords[2];
-        let length = Math.sqrt(vx * vx + vy * vy + vz * vz);
+        var vx = object.coords[0] - this.coords[0];
+        var vy = object.coords[1] - this.coords[1];
+        var vz = object.coords[2] - this.coords[2];
+        var length = Math.sqrt(vx * vx + vy * vy + vz * vz);
 
         if (length > 0 && length <= this.projection.maxDistance)
             //compute dot product of normalize object2camera vector & target2camera vector
@@ -1179,17 +1179,17 @@ if (!window.M3D) {
 
     M3D.Camera.prototype.update = function () {
 
-        let coords = this.coords;
-        let target = this.target;
-        let direction = this.direction;
+        var coords = this.coords;
+        var target = this.target;
+        var direction = this.direction;
 
         if (this.hasTarget) {
 
             //compute target2camera direction vector
-            let vx = target[0] - coords[0];
-            let vy = target[1] - coords[1];
-            let vz = target[2] - coords[2];
-            let length = Math.sqrt(vx * vx + vy * vy + vz * vz);
+            var vx = target[0] - coords[0];
+            var vy = target[1] - coords[1];
+            var vz = target[2] - coords[2];
+            var length = Math.sqrt(vx * vx + vy * vy + vz * vz);
 
             if (length !== 0) {
                 //normalize vector
@@ -1390,7 +1390,7 @@ if (!window.M3D) {
 
     M3D.Ligth.prototype.setDirection = function (x, y, z) {
 
-        let length = Math.sqrt(x * x + y * y + z * z);
+        var length = Math.sqrt(x * x + y * y + z * z);
 
         if (length !== 0) {
             //normalize direction
@@ -1410,7 +1410,7 @@ if (!window.M3D) {
     };
 
     M3D.Ligth.prototype.setDirection2Object = function(obj){
-        let x, y, z, length;
+        var x, y, z, length;
 
         if(obj instanceof M3D.Object) {
             x = this.coords.x - obj.coords.x;
@@ -1468,7 +1468,7 @@ if (!window.M3D) {
     };
 
     M3D.Ligth.prototype.update = function () {
-        let dx, dy, dz, length;
+        var dx, dy, dz, length;
 
         if (this.hasTarget) {
             //compute target2ligth direction
@@ -1624,7 +1624,7 @@ if (!window.M3D) {
     };
 
     M3D.Object.prototype.setModel = function (model) {
-        let modelInstance = null;
+        var modelInstance = null;
 
         if (model instanceof M3D.Model) {
 
@@ -1696,7 +1696,7 @@ if (!window.M3D) {
     };
 
     M3D.Object.prototype.deleteChildren = function (deletedObjectName) {
-        let childrenObject;
+        var childrenObject;
 
         if (this.childrens) {
             childrenObject = this.childrens && this.childrens.removeByName(deletedObjectName);
@@ -1719,8 +1719,8 @@ if (!window.M3D) {
     };
 
     M3D.Object.prototype.clearChildrens = function () {
-        let children = null;
-        let node;
+        var children = null;
+        var node;
 
         if (this.hasChildrens) {
             node = this.childrens.head;
@@ -1744,14 +1744,14 @@ if (!window.M3D) {
 
     M3D.Object.prototype.getChildrens = function (depth) {
 
-        let output = new M3D.Stack();
-        let isRoot = true;
-        let level = 0;
+        var output = new M3D.Stack();
+        var isRoot = true;
+        var level = 0;
 
-        let parent;
-        let object;
-        let node;
-        let stack;
+        var parent;
+        var object;
+        var node;
+        var stack;
 
         if (this.hasChildrens) {
             stack = this.stack;
@@ -1841,24 +1841,24 @@ if (!window.M3D) {
     
     M3Dp.Object.updateHerarchy = function () {
 
-        let stack = this.stack;
-        let isRoot = true;
+        var stack = this.stack;
+        var isRoot = true;
 
-        let object = null;
-        let parent = null;
-        let node = null;
+        var object = null;
+        var parent = null;
+        var node = null;
 
-        let updated;
-        let controller;
-        let geometry;
-        let coords;
-        let rotation;
-        let scale;
+        var updated;
+        var controller;
+        var geometry;
+        var coords;
+        var rotation;
+        var scale;
 
-        let parentTransformMatrix;
-        let localTransformMatrix;
-        let finalTransformMatrix;
-        let normalTransformMatrix;
+        var parentTransformMatrix;
+        var localTransformMatrix;
+        var finalTransformMatrix;
+        var normalTransformMatrix;
 
         //trave all herarchy tree levels
         do {
@@ -1971,7 +1971,7 @@ if (!window.M3D) {
 
     M3Dp.Object.updateObject = function () {
 
-        let finalTransformMatrix = this.finalMatrix;
+        var finalTransformMatrix = this.finalMatrix;
 
         //emulate entity controller
         if (this.controller){
@@ -2044,8 +2044,8 @@ if (!window.M3D) {
     M3D.Geometry.hasSphere2SphereColition = function(sphere1, sphere){
 
         //compute axis distance
-        let d = other.center[0] - this.center[0];
-        let length = d * d;
+        var d = other.center[0] - this.center[0];
+        var length = d * d;
 
         d = other.center[1] - this.center[1];
         length += d * d;
@@ -2060,9 +2060,9 @@ if (!window.M3D) {
 
     M3D.Geometry.hasBox2SphereColition = function(box, sphere){
 
-        let dx = other.center[0] - this.center[0];
-        let dy = other.center[1] - this.center[1];
-        let dz = other.center[2] - this.center[2];
+        var dx = other.center[0] - this.center[0];
+        var dy = other.center[1] - this.center[1];
+        var dz = other.center[2] - this.center[2];
 
         //get maxime distance betwen tow geometries (dr)
         //and dimension (dv) of this on selected axis
@@ -2133,8 +2133,8 @@ if (!window.M3D) {
         //get bounds center
         
         //compute X axis edges
-        let coord = this.center[0] = object.coords[0];
-        let semivalue = this.dimensions.width / 2;
+        var coord = this.center[0] = object.coords[0];
+        var semivalue = this.dimensions.width / 2;
         this.rigth = coord + semivalue;
         this.left = coord - semivalue;
 
@@ -2194,15 +2194,15 @@ if (!window.M3D) {
 
     M3D.RenderShaderFactory.loadRenderShader = function (renderer, vertexShaderURL, fragmentShaderURL, requestID) {
 
-        let async = this.requestAsync;
-        let user = this.requestUser;
-        let password = this.requestPassword;
+        var async = this.requestAsync;
+        var user = this.requestUser;
+        var password = this.requestPassword;
 
-        let vertexSource;
-        let fragmentSource;
-        let renderShader;
+        var vertexSource;
+        var fragmentSource;
+        var renderShader;
 
-        let onloadfragment = function () {
+        var onloadfragment = function () {
             console.timeEnd(timerID);
             fragmentSource = this.responseText;
             renderShader = self.createRenderShader(renderer, vertexSource, fragmentSource);
@@ -2213,7 +2213,7 @@ if (!window.M3D) {
             }
         };
 
-        let onloadvertex = function () {
+        var onloadvertex = function () {
             vertexSource = this.responseText;
 
             this.open('GET', fragmentShaderURL, async, user, password);
@@ -2222,9 +2222,9 @@ if (!window.M3D) {
 
         };
 
-        let XHR = new XMLHttpRequest();
-        let self = this;
-        let timerID = 'LOADING SHADER';
+        var XHR = new XMLHttpRequest();
+        var self = this;
+        var timerID = 'LOADING SHADER';
 
         console.time(timerID);
         console.log("Started request");
@@ -2251,12 +2251,12 @@ if (!window.M3D) {
     };
 
     M3D.RenderShaderFactory.createRenderShader = function (renderer, vertexCode, fragmentCode) {
-        let gl = renderer.gl;
-        let vertexShader, vertexShaderInfoLog;
-        let fragmentShader, fragmentShaderInfoLog;
-        let shaderProgram, shaderProgramInfoLog;
-        let isLinked, hasError;
-        let response = null;
+        var gl = renderer.gl;
+        var vertexShader, vertexShaderInfoLog;
+        var fragmentShader, fragmentShaderInfoLog;
+        var shaderProgram, shaderProgramInfoLog;
+        var isLinked, hasError;
+        var response = null;
 
         //Create shaders
         ///////////////////////////////////////////////////////
@@ -2369,40 +2369,40 @@ if (!window.M3D) {
     };
 
     M3Dp.RenderShader.addUniformArray = function (name, uniformName, length) {
-        let gl = this.gl;
-        let array = this.uniforms[name] = new Array(length);
+        var gl = this.gl;
+        var array = this.uniforms[name] = new Array(length);
 
         //add uniformst to array
-        for (let i = 0; i < length; i++) {
+        for (var i = 0; i < length; i++) {
             array[i] = gl.getUniformLocation(this, uniformName + '[' + i + ']');
         }
 
     };
 
     M3Dp.RenderShader.addUniformStruct = function (name, uniformName, fields) {
-        let gl = this.gl;
-        let struct = this.uniforms[name] = new Object();
-        let length = fields.length;
+        var gl = this.gl;
+        var struct = this.uniforms[name] = new Object();
+        var length = fields.length;
 
         //add fields to struct
-        for (let i = 0; i < length; i++) {
+        for (var i = 0; i < length; i++) {
             struct[fields[i]] = gl.getUniformLocation(this, uniformName + '.' + fields[i]);
         }
 
     };
 
     M3Dp.RenderShader.addUniformStructArray = function (name, uniformName, fields, length) {
-        let gl = this.gl;
-        let array = this.uniforms[name] = new Array();
-        let struct;
-        let size = fields.length;
+        var gl = this.gl;
+        var array = this.uniforms[name] = new Array();
+        var struct;
+        var size = fields.length;
 
         //add structs to array
-        for (let i = 0; i < length; i++) {
+        for (var i = 0; i < length; i++) {
             array[i] = struct = new Object();
 
             //add fields to struct
-            for (let j = 0; j < size; j++) {
+            for (var j = 0; j < size; j++) {
                 struct[fields[j]] = gl.getUniformLocation(this, uniformName + '[' + i + '].' + fields[j]);
             }
         }
@@ -2411,14 +2411,14 @@ if (!window.M3D) {
 
     M3Dp.RenderShader.disableVertexAttribs = function () {
 
-        for (let attribIndex in this.attribs) {
+        for (var attribIndex in this.attribs) {
             this.gl.disableVertexAttribArray(attribIndex);
         }
 
     };
 
     M3Dp.RenderShader.destroy = function () {
-        let gl = this.gl;
+        var gl = this.gl;
 
         //detach GL program shaders
         gl.detachShader(this, this.vertexShader);
@@ -2437,7 +2437,7 @@ if (!window.M3D) {
     //OutputFrameBuffer class contructor and properties
     ////////////////////////////////////////////////////////////////////////////
     M3D.OutputFramebuffer = function (renderer, width, height) {
-        let gl;
+        var gl;
 
         if (renderer instanceof M3D.SceneRenderer) {
             gl = renderer.gl;
@@ -2496,7 +2496,7 @@ if (!window.M3D) {
     };
 
     M3D.OutputFramebuffer.prototype.setSize = function (width, height) {
-        let gl = this.gl;
+        var gl = this.gl;
 
         if (width > 0 && height > 0) {
             this.width = width;
@@ -2554,14 +2554,14 @@ if (!window.M3D) {
     };
 
     M3D.FPSCounter.prototype.countFrame = function () {
-        let currentTime = new Date().getTime();
+        var currentTime = new Date().getTime();
 
-        let lastSecondTime = this.lastSecondTime;
-        let lastFrameTime = this.lastFrameTime;
+        var lastSecondTime = this.lastSecondTime;
+        var lastFrameTime = this.lastFrameTime;
 
-        let secondInterval;
-        let frameInterval;
-        let hasFrame = false;
+        var secondInterval;
+        var frameInterval;
+        var hasFrame = false;
 
         if (lastSecondTime <= 0) {
             //initialize first frame time
@@ -2584,7 +2584,7 @@ if (!window.M3D) {
 
                 if (this.frameNumberLogSize >= 60) {
                     //move back before registred FPS Stats
-                    for (let i = 0; i < 59; i++) {
+                    for (var i = 0; i < 59; i++) {
                         this.frameNumberLog[i] = this.frameNumberLog[i + 1];
                     }
 
@@ -2621,7 +2621,7 @@ if (!window.M3D) {
 
             if (this.frameIntervalsLogSize >= 60) {
                 //move back before registred intervals
-                for (let i = 0; i < 59; i++) {
+                for (var i = 0; i < 59; i++) {
                     this.frameIntervalsLog[i] = this.frameIntervalsLog[i + 1];
                 }
 
@@ -2666,8 +2666,8 @@ if (!window.M3D) {
         x || (x = 0);
         y || (y = 0);
 
-        let array = this.frameNumberLog;
-        let length = this.frameNumberLogSize;
+        var array = this.frameNumberLog;
+        var length = this.frameNumberLogSize;
 
         context2d.save();
 
@@ -2694,7 +2694,7 @@ if (!window.M3D) {
         context2d.strokeRect(x, y - 60, 60, 60);
 
         context2d.fillStyle = 'white';
-        for (let i = 0, value; i < length; i++) {
+        for (var i = 0, value; i < length; i++) {
             value = array[i];
 
             if (value < 0) {
@@ -2729,8 +2729,8 @@ if (!window.M3D) {
         x || (x = 0);
         y || (y = 0);
 
-        let array = this.frameIntervalsLog;
-        let length = this.frameIntervalsLogSize;
+        var array = this.frameIntervalsLog;
+        var length = this.frameIntervalsLogSize;
 
         context2d.save();
 
@@ -2758,7 +2758,7 @@ if (!window.M3D) {
         context2d.strokeRect(x, y - 60, 60, 60);
 
         context2d.fillStyle = 'white';
-        for (let i = 0, value; i < length; i++) {
+        for (var i = 0, value; i < length; i++) {
             value = array[i];
 
             if (value < 0) {
@@ -2801,7 +2801,7 @@ if (!window.M3D) {
 
         //create one WebGL context to renderize
         ////////////////////////////////////////////////
-        let gl = canvas.getContext('webgl2') ||
+        var gl = canvas.getContext('webgl2') ||
             canvas.getContext('webgl') ||
             canvas.getContext('experimental-webgl');
 
@@ -2853,7 +2853,7 @@ if (!window.M3D) {
     };
 
     M3D.SceneRenderer.prototype.destroyRenderShader = function (name) {
-        let shader = this.shaders.removeByName(name);
+        var shader = this.shaders.removeByName(name);
 
         if (shader) {
             //detroy gl shder
@@ -2872,7 +2872,7 @@ if (!window.M3D) {
     };
 
     M3D.SceneRenderer.prototype.setClearColor = function (red, green, blue, alpha) {
-        let color = this.clearColor;
+        var color = this.clearColor;
         red >= 0 && (color.red = red);
         green >= 0 && (color.green = green);
         blue >= 0 && (color.blue = blue);
@@ -2887,33 +2887,33 @@ if (!window.M3D) {
 
     M3D.SceneRenderer.prototype.drawScene = function (scene, camera, renderOptions) {
 
-        let gl = this.gl;
-        let canvas = this.canvas;
-        let clearColor = this.clearColor;
+        var gl = this.gl;
+        var canvas = this.canvas;
+        var clearColor = this.clearColor;
 
-        let usedModel;
-        let usedShader;
-        let usedShaderUniforms;
-        let newShader;
+        var usedModel;
+        var usedShader;
+        var usedShaderUniforms;
+        var newShader;
 
-        let objects;
-        let models;
-        let ligths;
+        var objects;
+        var models;
+        var ligths;
 
-        let objectNode;
-        let modelNode;
-        let ligthNode;
+        var objectNode;
+        var modelNode;
+        var ligthNode;
 
-        let ligthIndex;
+        var ligthIndex;
 
         //render options
-        let shader = null;
-        let outputFramebuffer = null;
-        let executeDrawCalls = true;
-        let preserveDrawCalls = false;
-        let depthTestEnable = true;
-        let cullFaceEnable = true;
-        let blendEnable = false;
+        var shader = null;
+        var outputFramebuffer = null;
+        var executeDrawCalls = true;
+        var preserveDrawCalls = false;
+        var depthTestEnable = true;
+        var cullFaceEnable = true;
+        var blendEnable = false;
 
         //get output configuration
         if (renderOptions) {
@@ -3081,7 +3081,7 @@ if (!window.M3D) {
     //Animator class constructor and properties
     ////////////////////////////////////////////////////////////////////////////
     M3D.Animator = function () {
-        let animator = this;
+        var animator = this;
 
         this.time = 0;
         this.delta = 0;
@@ -3089,7 +3089,7 @@ if (!window.M3D) {
         this.requestID = 0;
 
         this.drawFrame = function () {
-            let ntime;
+            var ntime;
 
             if (animator.callback) {
 
@@ -3172,7 +3172,7 @@ if (!window.M3D) {
     };
 
     M3D.SoundContext.prototype.removeSound = function (src) {
-        let soundTrack;
+        var soundTrack;
 
         //remove source sound track
         if (src instanceof M3D.SoundTrack)
@@ -3186,7 +3186,7 @@ if (!window.M3D) {
     };
 
     M3D.SoundContext.prototype.playSound = function (src, reset) {
-        let soundTrack;
+        var soundTrack;
 
         //get source sound track
         if (src instanceof M3Dp.SoundTrack)
@@ -3206,7 +3206,7 @@ if (!window.M3D) {
     };
 
     M3D.SoundContext.prototype.pauseSound = function (src) {
-        let soundTrack;
+        var soundTrack;
 
         //get source sound track
         if (src instanceof M3Dp.SoundTrack)
@@ -3223,9 +3223,9 @@ if (!window.M3D) {
 
     M3D.SoundContext.prototype.generateSoundTrack = function (name, url, volume, hasLoop) {
 
-        let context = this.audioContext;
-        let gainNode = context.createGain();
-        let soundTrack = new M3Dp.SoundTrack(name);
+        var context = this.audioContext;
+        var gainNode = context.createGain();
+        var soundTrack = new M3Dp.SoundTrack(name);
 
         //define sound track properties
         soundTrack.src = url;
@@ -3242,9 +3242,9 @@ if (!window.M3D) {
 
     M3D.SoundContext.prototype.generateSoundPool = function (name, url, volume) {
 
-        let context = this.audioContext;
-        let gainNode = context.createGain();
-        let soundPool = new M3Dp.SoundPool(name);
+        var context = this.audioContext;
+        var gainNode = context.createGain();
+        var soundPool = new M3Dp.SoundPool(name);
 
         //define sound pool properties
         soundPool.src = url;
@@ -3261,10 +3261,10 @@ if (!window.M3D) {
     M3Dp.getSoundBufferData = function (context, soundTrack) {
 
         //load source data stream
-        let xhr = new XMLHttpRequest();
+        var xhr = new XMLHttpRequest();
         xhr.open('GET', soundTrack.src, true);
         xhr.onload = function () {
-            let stream = this.response;
+            var stream = this.response;
 
             //decode data of stream to formated Float32Array
             context.decodeAudioData(stream, function (decodedDataBuffer) {
@@ -3313,14 +3313,14 @@ if (!window.M3D) {
     };
 
     M3Dp.SoundTrack.prototype.setVolume = function (volume) {
-        let gain = this.gainNode.gain;
+        var gain = this.gainNode.gain;
 
         gain.value = volume / 100;
 
     };
 
     M3Dp.SoundTrack.prototype.play = function (reset) {
-        let self = this;
+        var self = this;
 
         //set play state
         this.playing = true;
@@ -3334,7 +3334,7 @@ if (!window.M3D) {
             //configure source audio buffer node
             this.mediaNode.buffer = this.sourceBuffer;
             this.mediaNode.onended = function (event) {
-                let mediaNode = event.target;
+                var mediaNode = event.target;
 
                 //disconnect source audio buffer node
                 mediaNode.disconnect();
@@ -3367,7 +3367,7 @@ if (!window.M3D) {
     };
 
     M3Dp.SoundTrack.prototype.pause = function () {
-        let time = this.audioContext.currentTime;
+        var time = this.audioContext.currentTime;
 
         //disable play state
         this.playing = false;
@@ -3403,15 +3403,15 @@ if (!window.M3D) {
     M3Dp.SoundPool.prototype = Object.create(M3Dp.SoundTrack.prototype);
 
     M3Dp.SoundPool.prototype.setVolume = function (volume) {
-        let gain = this.gainNode.gain;
+        var gain = this.gainNode.gain;
 
         gain.value = volume / 100;
 
     };
 
     M3Dp.SoundPool.prototype.play = function () {
-        let mediaInstanceNode;
-        let instances = this.instances;
+        var mediaInstanceNode;
+        var instances = this.instances;
 
         if (this.sourceBuffer) {
 
@@ -3422,7 +3422,7 @@ if (!window.M3D) {
             mediaInstanceNode.buffer = this.sourceBuffer;
             mediaInstanceNode.listNode = new M3D.Node(mediaInstanceNode);
             mediaInstanceNode.onended = function (event) {
-                let mediaNode = event.target;
+                var mediaNode = event.target;
                 mediaNode.disconnect();                     //discnnect buffer node from audio context
                 instances.removeNode(mediaNode.listNode);   //remove buffer node from instances list
 
@@ -3438,7 +3438,7 @@ if (!window.M3D) {
     };
 
     M3Dp.SoundPool.prototype.pause = function () {
-        let listNode = this.instances.head;
+        var listNode = this.instances.head;
 
         //stop all source audio instances
         while (listNode) {

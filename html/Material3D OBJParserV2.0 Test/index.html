@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html>
+
     <head>
         <title>Model Viewer V2.0</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+
         <script src="js/main.js"></script>
-        
+
         <script src="../../js/M3D/M3D.js"></script>
         <script src="../../js/M3D/MathGL.js"></script>
-        
+
         <script src="../../js/M3D/loaders/obj/OBJModelLoader.js"></script>
         <script src="../../js/M3D/loaders/stl/STLModelLoader.js"></script>
         <script src="../../js/M3D/loaders/dae/DAEModelLoader.js"></script>
-        
-        <script src="../../js/M3D/particles/ParticleGenerator.js"></script>
-        
-        <style>
 
+        <script src="../../js/M3D/generators/ParticleGenerator.js"></script>
+
+        <style>
             * {
                 margin: 0;
                 padding: 0;
@@ -28,14 +28,16 @@
             }
 
             #glCanvas {
-                z-index: 0; 
+                z-index: 0;
             }
 
             #guiCanvas {
-                z-index: 1; 
+                z-index: 1;
             }
-            
-            input, button {
+
+            input,
+            select,
+            button {
                 position: absolute;
                 z-index: 3;
             }
@@ -86,68 +88,54 @@
                 display: block;
                 position: absolute;
                 z-index: 3;
-                
+
                 left: 5%;
                 top: 20%;
                 width: max-content;
                 height: max-content;
-                
+
                 align-content: center;
                 text-align: left;
                 font-size: 100%;
             }
-            
+
             .controlLabel {
                 margin-bottom: 3%;
             }
-            
+
             .controls {
                 display: block;
                 position: relative;
-                
+
                 width: 80%;
                 height: 1vw;
-                
+
                 margin-left: 2%;
                 margin-top: 10%;
             }
-            
+
             .range {
                 width: 80%;
                 height: 10%;
             }
-            
         </style>
     </head>
+
     <body onload="main();">
         <canvas id="glCanvas" width="512" height="256"></canvas>
         <canvas id="guiCanvas" width="512" height="512"></canvas>
-        <input id="selectorModel" type="text" list="list" value="OBJ | Android">
 
-        <div id="cameraControl">
-            <p class="controlLabel">CAMERA COORDS<br>
-            <p class="controls">X:<input id="cameraX" class="range" type="range" min="-100.0" max="100.0" onchange="camera.coords.x = this.value/100 * 10;"><br>
-            <p class="controls">Y:<input id="cameraY" class="range" type="range" min="-100.0" max="100.0" onchange="camera.coords.y = this.value/100 * 10;"><br>
-            <p class="controls">Z:<input id="cameraZ" class="range" type="range" min="-100.0" max="100.0" onchange="camera.coords.z = this.value/100 * 10;"><br>
-            <p class="controls">Fv:<input id="cameraFOV" class="range" type="range" min="1" max="1000" onchange="camera.projection.fieldOfView = this.value / 10;"><br>
-            </p>
-        </div>
-
-
-        <input id="selectorInstances" type="number" value="1" max="100" min="1" onchange="changeInstanceNumber();">
-
-        <button id="loadButton" onclick="selectModel();">LOAD</button>
-        <button id="multiplyButton" onclick="changeInstanceNumber();">UPD</button>
-
-        <datalist id="list">
+        <!-- Model Selection fields -->
+        <select id="selectorModel" type="text" onchange="selectModel();">
+            
             <option>ASCII_STL | Cube | 1 | invertedYZ</option>
-            <option>ASCII_STL | Octocat | 0.05  | invertedYZ</option>
-            <option>ASCII_STL | Stone | 0.01  | invertedYZ</option>
+            <option>ASCII_STL | Octocat | 0.05 | invertedYZ</option>
+            <option>ASCII_STL | Stone | 0.01 | invertedYZ</option>
             
             <option>BINARY_STL | Cube | 1 | invertedYZ</option>
             <option>BINARY_STL | Octocat | 0.05 | invertedYZ</option>
             <option>BINARY_STL | Part</option>
-            
+
             <option>DAE | Cube</option>
             
             <option>LINEAL_PARTICLES | Fire | 5 | 3 | 0 | LOOP</option>
@@ -162,7 +150,7 @@
             <option>OBJ | Airplane JET | 0.003 | invertedYZ</option>
             <option>OBJ | Alpha Spaceship</option>
             <option>OBJ | Amaryllis City | 0.0001</option>
-            <option>OBJ | Android | 0.01</option>
+            <option selected>OBJ | Android | 0.01</option>
             <option>OBJ | Bambo House | 0.1</option>
             <option>OBJ | Battle Ship CV-EssexClass | 1 </option>
             <option>OBJ | Big Truck | 1 </option>
@@ -208,12 +196,31 @@
             <option>OBJ | Wath Tower</option>
             <option>OBJ | Wolf One | 5</option>
             <option>OBJ | plane</option>
-            
+
             <option>RADIAL_PARTICLES | Blue Fire | 5 | 3 | 15 | LOOP | RESIZE | CHANGE</option>
             <option>RADIAL_PARTICLES | Snow | 1 | 1 | 1 </option>
             <option>RADIAL_PARTICLES | Explosion | 1 | 1 | 1 </option>
-            
-        </datalist>
+        </select>
+
+        <div id="cameraControl">
+            <p class="controlLabel">CAMERA COORDS<br>
+            <p class="controls">X:<input id="cameraX" class="range" type="range" min="-100.0" max="100.0"
+                    onchange="camera.coords.x = this.value/100 * 10;"><br>
+            <p class="controls">Y:<input id="cameraY" class="range" type="range" min="-100.0" max="100.0"
+                    onchange="camera.coords.y = this.value/100 * 10;"><br>
+            <p class="controls">Z:<input id="cameraZ" class="range" type="range" min="-100.0" max="100.0"
+                    onchange="camera.coords.z = this.value/100 * 10;"><br>
+            <p class="controls">Fv:<input id="cameraFOV" class="range" type="range" min="1" max="1000"
+                    onchange="camera.projection.fieldOfView = this.value / 10;"><br>
+            </p>
+        </div>
+
+
+        <input id="selectorInstances" type="number" value="1" max="100" min="1"
+            onchange="changeInstanceNumber();">
+
+        <button id="multiplyButton" onclick="changeInstanceNumber();">UPD</button>
 
     </body>
+
 </html>

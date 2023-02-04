@@ -40,14 +40,11 @@ var screenWidth = window.screen.innerWidth;
 var screenHeight = window.screen.innerHeight;
 var screenRatio = screenWidth / screenHeight;
 
-function onerrorcall(err){
-    alert.error(err);
+function onerrorcall(err) {
+    console.error(err);
 }
 
 window.onerror = onerrorcall;
-
-
-
 
 function main() {
 
@@ -59,12 +56,16 @@ function main() {
 
     //get canvases render contexts
     gl = glCanvas.getContext('webgl') || glCanvas.getContext('experimental-webgl');
-    context2D = guiCanvas.getContext('2d', {alpha: true});
+    context2D = guiCanvas.getContext('2d', { alpha: true });
 
     //configure OBJ and STL model loader
     OBJModelLoader.maxSamplerSize = gl.getParameter(gl.MAX_TEXTURE_SIZE) / 2;
+
     OBJModelLoader.onload = useModel;
     STLModelLoader.onload = useModel;
+
+    OBJModelLoader.onerror = alertError;
+    STLModelLoader.onerror = alertError;
 
     OBJModelLoader.requestAsync = true;
     STLModelLoader.requestAsync = true;
@@ -100,7 +101,7 @@ function createScene() {
     ligths = [];
 
     ligths[0] = new M3D.Ligth('AMBIENTAL_LIGTH', M3D.Ligth.AMBIENTAL);
-    ligths[0].setColor(0.5, 0.5, 0.5);
+    ligths[0].setColor(0.7, 0.7, 0.7);
     ligths[0].enable = true;
 
     ligths[1] = new M3D.Ligth('WHITE_SPOT_LIGTH', M3D.Ligth.SPOT);
@@ -166,11 +167,11 @@ function animate() {
     var ntime = new Date().getTime();
     var deltaTime = 0;
     var object;
-    
+
     //compute delay delta time porcentage
     if (time !== 0)
         deltaTime = (ntime - time) / 1000;
-    
+
     time = ntime;
 
     frameTest && console.group('FRAME_TEST');
@@ -248,7 +249,7 @@ function animate() {
             objects[0].update();
         }
         frameTest && console.timeEnd('UPDATING_SCENE_OBJECTs');
-        
+
     }
 
     frameTest && console.timeEnd('CPU_FRAME_TIME');
@@ -314,7 +315,7 @@ function selectModel() {
 
                     //load model from file
                     newShader = OBJShader;
-                    DAEModelLoader.loadDAEFile(gl, modelsRootFolder + fileName + '/' + fileName + '.dae', scale, function () {})
+                    DAEModelLoader.loadDAEFile(gl, modelsRootFolder + fileName + '/' + fileName + '.dae', scale, function () { })
                 }
                 break;
 
@@ -478,6 +479,26 @@ function useModel(newModel) {
         animate();
 
     }
+}
+
+function alertError() {
+    let cx = glCanvas.width / 2;
+    let cy = glCanvas.height / 2;
+    
+    //clear message
+    context2D.clearRect(glCanvas.width / 2 - 100, glCanvas.height / 2 - 20, 200, 40);
+    
+    //show message
+    context2D.fillStyle = 'red';
+    context2D.fillRect(cx - 100, cy - 20, 200, 40);
+    context2D.fillStyle = 'white';
+    context2D.fillText('ERROR LOADING MODEL', cx - 90, cy - 5);
+    
+    console.log('/**************************************************/');
+    
+    //  message clear has automatically lather to 5seconds
+    setInterval(()=>context2D.clearRect(glCanvas.width / 2 - 100, glCanvas.height / 2 - 20, 200, 40), 5000)
+
 }
 
 function changeInstanceNumber() {

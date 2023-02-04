@@ -102,22 +102,22 @@ function createSceneElements() {
     //make scene objects and declare its properties
     //////////////////////////////////
     object1 = new M3D.Object("ICONOSPHERE", iconosphere);
-    object1.model.model.materials[0].difuseColor = new Float32Array([0.9, 0, 0.8]);
+    object1.model.model.materials[0].difuseColor.set([0.9, 0, 0.8]);
     object1.setCoords(0, 2, 0);
     object1.visible = true;
 
     object2 = new M3D.Object("SPHERE", sphere);
-    object2.model.model.materials[0].difuseColor = new Float32Array([0.1, 0.8, 0.2]);
+    object2.model.model.materials[0].difuseColor.set([0.1, 0.8, 0.2]);
     object2.setCoords(-2, 0, 0);
     object2.visible = true;
 
     object3 = new M3D.Object("TORUS", torus);
-    object3.model.model.materials[0].difuseColor = new Float32Array([0.9, 0.2, 0.2]);
+    object3.model.model.materials[0].difuseColor.set([0.9, 0.2, 0.2]);
     object3.setCoords(2, 0, 0);
     object3.visible = true;
 
     object4 = new M3D.Object("CYLINDER", cylinder);
-    object4.model.model.materials[0].difuseColor = new Float32Array([0, 0.5, 0.8]);
+    object4.model.model.materials[0].difuseColor.set([0, 0.5, 0.8]);
     object4.setScale(0.5);
     object4.setCoords(0, -2, 0);
     object4.visible = true;

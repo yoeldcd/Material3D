@@ -41,20 +41,20 @@
  */
 
 var MATHGL = new (function () {
-    
+
     this.MATRIX = {};
     this.VECTOR = {};
     
-    let stack = new Array(100);
-    let stackSize = 100;
-    let stackUsed = 0;
+    var stack = new Array(100);
+    var stackSize = 100;
+    var stackUsed = 0;
 
     //initialize stack slots
-    for (let i = 0; i < 100; i++) {
+    for (var i = 0; i < 100; i++) {
         stack[i] = new Float32Array(16);
     }
     
-    let identityMatrix = new Float32Array([
+    var identityMatrix = new Float32Array([
         1, 0, 0, 0,
         0, 1, 0, 0,
         0, 0, 1, 0,
@@ -63,7 +63,7 @@ var MATHGL = new (function () {
     
     
     this.MATRIX.makeMat4 = function (numArray) {
-        let matrix = new Float32Array(numArray ? numArray : identityMatrix);
+        var matrix = new Float32Array(numArray ? numArray : identityMatrix);
         
         Object.defineProperty(matrix, 'isMatrix', {
             configurable: false,
@@ -84,7 +84,7 @@ var MATHGL = new (function () {
     this.MATRIX.utilMatrix7 = this.MATRIX.makeMat4();
     
     this.VECTOR.makeVector = function (x, y, z, w) {
-        let vec = new Object();
+        var vec = new Object();
         
         vec.x = x || 0;
         vec.y = y || 0;
@@ -213,7 +213,7 @@ var MATHGL = new (function () {
      */
 
     this.MATRIX.transpose = function (mat, dst) {
-        let t;
+        var t;
         dst || (dst = mat);
         
         //make traspose 
@@ -277,7 +277,7 @@ var MATHGL = new (function () {
      */
 
     this.MATRIX.cofactor = function (mat, dst) {
-        let a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p;
+        var a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p;
         dst || (dst = mat);
         
         //load matrix components
@@ -336,7 +336,7 @@ var MATHGL = new (function () {
      */
 
     this.MATRIX.adjunte = function (mat, dst) {
-        let a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p;
+        var a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p;
         dst || (dst = mat);
         
         //load matrix components
@@ -396,8 +396,8 @@ var MATHGL = new (function () {
      */
 
     this.MATRIX.invert = function (mat, dst) {
-        let det;
-        let a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p;
+        var det;
+        var a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p;
         dst || (dst = mat);
         
         //load matrix components
@@ -463,8 +463,8 @@ var MATHGL = new (function () {
      */
 
     this.MATRIX.multiply = function (mat1, mat2, dst) {
-        let x, y, z, w;
-        let a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p;
+        var x, y, z, w;
+        var a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p;
         dst || (dst = mat1);
         
         //load matrix 2 compoents
@@ -536,8 +536,8 @@ var MATHGL = new (function () {
      */
 
     this.MATRIX.multiplyTranspose = function (mat1, mat2, dst) {
-        let x, y, z, w;
-        let a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p;
+        var x, y, z, w;
+        var a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p;
         dst || (dst = mat1);
         
         //load matrix 2 components
@@ -646,7 +646,7 @@ var MATHGL = new (function () {
 
     this.MATRIX.translate = function (mat, Tx, Ty, Tz) {
         
-        let a, b, c, d;
+        var a, b, c, d;
         
         //translated X
         a = mat[0];
@@ -725,8 +725,8 @@ var MATHGL = new (function () {
      * */
 
     this.MATRIX.rotateX = function (mat, alpha, isRadian) {
-        let y, z;
-        let s, c;
+        var y, z;
+        var s, c;
         
         if (alpha) {
             isRadian || (alpha *= Math.PI / 180);
@@ -772,8 +772,8 @@ var MATHGL = new (function () {
      *  */
 
     this.MATRIX.rotateY = function (mat, beta, isRadian) {
-        let x, z;
-        let s, c;
+        var x, z;
+        var s, c;
         
         if (mat && beta) {
 
@@ -819,8 +819,8 @@ var MATHGL = new (function () {
      * */
 
     this.MATRIX.rotateZ = function (mat, omega, isRadian) {
-        let x, y;
-        let s, c;
+        var x, y;
+        var s, c;
 
         if (mat && omega) {
             isRadian || (omega *= Math.PI / 180);
@@ -871,11 +871,11 @@ var MATHGL = new (function () {
     
     this.MATRIX.loockAt = function (mat, x, y, z, atx, aty, atz, upx, upy, upz) {
 
-        let vxX, vxY, vxZ;
-        let vyX, vyY, vyZ;
-        let vzX, vzY, vzZ;
+        var vxX, vxY, vxZ;
+        var vyX, vyY, vyZ;
+        var vzX, vzY, vzZ;
         
-        let a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p;
+        var a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p;
         
         //load matrix components
         a = mat[0];
@@ -983,10 +983,10 @@ var MATHGL = new (function () {
     this.MATRIX.project = function (mat, fieldOfView, isRadian, ratio, znear, zfar) {
         isRadian || (fieldOfView = fieldOfView / 180 * Math.PI);
         
-        let fv = 1.0 / Math.tan(fieldOfView / 2);
-        let inversev = 1 / (znear - zfar);
-        let x, y, z, w;
-        let i, j, k, l;
+        var fv = 1.0 / Math.tan(fieldOfView / 2);
+        var inversev = 1 / (znear - zfar);
+        var x, y, z, w;
+        var i, j, k, l;
         
         //row 0
         x = fv / ratio;
@@ -1032,9 +1032,9 @@ var MATHGL = new (function () {
      */
 
     this.MATRIX.push = function (mat) {
-        let stackTop;
-        let size = stackSize;
-        let used = stackUsed;
+        var stackTop;
+        var size = stackSize;
+        var used = stackUsed;
         
         if (mat) {
             used < size || (stack[size] = new Float32Array(16));
@@ -1069,8 +1069,8 @@ var MATHGL = new (function () {
      */
 
     this.MATRIX.pop = function (mat) {
-        let stackTop;
-        let used = this.stackUsed;
+        var stackTop;
+        var used = this.stackUsed;
         
         if (mat) {
             stackTop = used >= 0 ? stack[used] : identityMatrix;
@@ -1162,9 +1162,9 @@ var MATHGL = new (function () {
      */
 
     this.VECTOR.cross = function (vec1, vec2, dst) {
-        let vx = vec1.x;
-        let vy = vec1.y;
-        let vz = vec1.z;
+        var vx = vec1.x;
+        var vy = vec1.y;
+        var vz = vec1.z;
         
         dst || (dst = vec1);
         
@@ -1182,7 +1182,7 @@ var MATHGL = new (function () {
     this.VECTOR.normalize = function (vec, dst) {
         dst || (dst = vec);
         
-        let length = Math.sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z) || 1;
+        var length = Math.sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z) || 1;
         
         dst.x = vec.x / length;
         dst.y = vec.y / length;
@@ -1263,8 +1263,8 @@ var MATHGL = new (function () {
      */
 
     this.VECTOR.rotateX = function (vec, alpha, isRadian) {
-        let s, c;
-        let y;
+        var s, c;
+        var y;
         
         if (alpha) {
             isRadian || (alpha *= Math.PI / 180);
@@ -1290,8 +1290,8 @@ var MATHGL = new (function () {
      */
 
     this.VECTOR.rotateY = function (vec, beta, isRadian) {
-        let s, c;
-        let x;
+        var s, c;
+        var x;
         
         if (beta) {
             isRadian || (beta *= Math.PI / 180);
@@ -1317,8 +1317,8 @@ var MATHGL = new (function () {
      */
 
     this.VECTOR.rotateZ = function (vec, ganma, isRadian) {
-        let s, c;
-        let x;
+        var s, c;
+        var x;
         
         if (ganma) {
             isRadian || (ganma *= Math.PI / 180);
@@ -1356,7 +1356,7 @@ var MATHGL = new (function () {
      */
 
     this.VECTOR.multiplyMatrix = function (op1, op2, dst) {
-        let x, y, z, w;
+        var x, y, z, w;
         
         if (op1 && op2) {
             if (op1.isMatrix && op2.isVector) {
@@ -1403,7 +1403,7 @@ var MATHGL = new (function () {
     */
     
     this.VECTOR.toFloat32Array = function (vec){
-        let f32array = Float32Array();
+        var f32array = Float32Array();
         
         f32array [0] = vec.x;
         f32array [1] = vec.y;

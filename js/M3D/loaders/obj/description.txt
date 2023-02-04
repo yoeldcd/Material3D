@@ -7,7 +7,7 @@
     developments.
 
     The use of this tool is more easy. You only need make a one WebGL context and call to loadOBJFile(...) method
-    providing required information about file location and others optional params.
+    providi ng required information about file location and others optional params.
 
     Example 1:
     

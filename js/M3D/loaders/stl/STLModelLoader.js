@@ -7,13 +7,13 @@ if(!window.M3D){
     
 }
 
-var STLModelLoader = {};
+let STLModelLoader = {};
 
 (function () {
-    var identityMatrix = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
-
-    var STLGeneratedModelID = 62672000;
-    var STLGeneratedInstanceID = 62672000;
+    let identityMatrix = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+    
+    let STLGeneratedModelID = 62672000;
+    let STLGeneratedInstanceID = 62672000;
 
     function BoundBox() {
         this.rigth = -999999999;
@@ -111,30 +111,34 @@ var STLModelLoader = {};
      */
     STLModelLoader.loadASCIISTLFile = function (gl, url, scale, responseID) {
         
-        var async = this.requestAsync;
-        var user = this.requestUser;
-        var password = this.requestPassword;
+        let async = this.requestAsync;
+        let user = this.requestUser;
+        let password = this.requestPassword;
 
-        var self = this;
-        var timerID = 'Loading Model on URL ' + url;
+        let self = this;
+        let timerID = 'Loading Model on URL ' + url;
+        
+        let responseCallback = this.onload;
+        let errorCallback = this.onerror || this.onload;
 
-        var responseCallback = this.onload;
-        var errorCallback = this.onerror || this.onload;
-
-        var XHR = new XMLHttpRequest();
-        var response;
+        let XHR = new XMLHttpRequest();
+        let response;
 
         XHR.onload = function () {
-            console.timeEnd(timerID);
             
-            var fileInfo = self.parseFileInfo(url);
+            if (this.status != 200)
+                return this.onerror()
+            
+            let fileInfo = self.parseFileInfo(url);
+            
+            console.timeEnd(timerID);
             
             // get parse model and asign source file information
             response = self.parseSTLText(gl, this.responseText, scale);
             response.srcFile = fileInfo;
             
             responseCallback && responseCallback(response, responseID);
-
+        
         };
 
         XHR.onerror = function () {
@@ -187,33 +191,33 @@ var STLModelLoader = {};
     STLModelLoader.parseSTLText = function (gl, sourceText, scale) {
         scale || (scale = 1);
 
-        var timerID = 'Parsing Time ';
+        let timerID = 'Parsing Time ';
         console.time(timerID);
 
-        var lines = sourceText.split('\n');
-        var numLines = lines.length;
-        var words = null;
+        let lines = sourceText.split('\n');
+        let numLines = lines.length;
+        let words = null;
 
-        var workGroup = this.createNewWorkGroup(gl);
-        var vertexs = workGroup.faceVertexs;
+        let workGroup = this.createNewWorkGroup(gl);
+        let vertexs = workGroup.faceVertexs;
 
-        var vertex;
-        var normal = workGroup.faceNormal;
+        let vertex;
+        let normal = workGroup.faceNormal;
 
         //file parser states
-        var solidOpened = false;
-        var facetOpened = false;
-        var outerLoopOpened = false;
-        var poligonVertexsNumber = 0;
+        let solidOpened = false;
+        let facetOpened = false;
+        let outerLoopOpened = false;
+        let poligonVertexsNumber = 0;
 
-        var t;
-        var nx, ny, nz;
-        var vx, vy, vz;
-        var bounds = workGroup.bounds;
+        let t;
+        let nx, ny, nz;
+        let vx, vy, vz;
+        let bounds = workGroup.bounds;
 
         //Parse each file lines
         ///////////////////////////////////////////////
-        for (var i = 0; i < numLines; i++) {
+        for (let i = 0; i < numLines; i++) {
             words = this.getLineWords(lines[i]);
 
             switch (words[0]) {
@@ -285,7 +289,7 @@ var STLModelLoader = {};
                         if (poligonVertexsNumber > 3) {
                             poligonVertexsNumber -= 2;
 
-                            for (var i = 2; i < poligonVertexsNumber; i++) {
+                            for (let i = 2; i < poligonVertexsNumber; i++) {
                                 this.storeFaceTriangle(workGroup, normal, vertexs[0], vertexs[i], vertexs[i + 1]);
                             }
                         }
@@ -386,30 +390,36 @@ var STLModelLoader = {};
      */
     STLModelLoader.loadBinarySTLFile = function (gl, url, scale, responseID) {
 
-        var async = this.requestAsync;
-        var user = this.requestUser;
-        var password = this.requestPassword;
+        let async = this.requestAsync;
+        let user = this.requestUser;
+        let password = this.requestPassword;
 
-        var self = this;
-        var timerID = 'Loading Model on URL ' + url;
+        let self = this;
+        let timerID = 'Loading Model on URL ' + url;
 
-        var responseCallback = this.onload;
-        var errorCallback = this.onerror || this.onload;
-
-        var XHR = new XMLHttpRequest();
-        var response;
+        let responseCallback = this.onload;
+        let errorCallback = this.onerror || this.onload;
+        
+        let XHR = new XMLHttpRequest();
+        let response;
 
         XHR.onload = function () {
+            
+            // check XHR status
+            if (this.status != 200)
+                return this.onerror()
+            
+            let arrayBuffer;
+            let fileInfo = self.parseFileInfo(url);
+            
             console.timeEnd(timerID);
-            var arrayBuffer;
-            var fileInfo = self.parseFileInfo(url);
             
             if (async) {
                 //get response binary data array
                 arrayBuffer = this.response;
             
             } else {
-
+                
                 //get response text data and transform on bynary array buffer
                 arrayBuffer = self.parseTextToStreamArray(this.responseText);
             }
@@ -424,8 +434,8 @@ var STLModelLoader = {};
 
         XHR.onerror = function () {
             console.timeEnd(timerID);
-            console.error('ERORO: Loading Data');
-
+            console.error('ERROR: Loading Model Data');
+            
             response = null;
             errorCallback && errorCallback(responseID, url);
             
@@ -433,20 +443,20 @@ var STLModelLoader = {};
 
         //perform request
         XHR.open('GET', url, async, user, password);
-
+        
         if (async)
             //define response as bynary
             XHR.responseType = 'arraybuffer';
         else
             //overryde response MIME-TYPE to ASCII Text
             XHR.overrideMimeType('text\/plain; charset=x-user-defined');
-
+        
         //initialize time counter
         console.time(timerID);
-
+        
         //send request
         XHR.send(null);
-
+        
         return response;
     };
     
@@ -454,37 +464,37 @@ var STLModelLoader = {};
     STLModelLoader.parseSTLBytes = function (gl, sourceBuffer, scale) {
         scale || (scale = 1);
 
-        var timerID = 'Parsing Time ';
+        let timerID = 'Parsing Time ';
         console.time(timerID);
 
-        var workGroup = this.createNewWorkGroup(gl, scale);
-        var numTriangles = 0;
+        let workGroup = this.createNewWorkGroup(gl, scale);
+        let numTriangles = 0;
 
-        var targetGLBuffer;
-        var vertexGLBuffer;
-        var vertexGLBufferAttribs = {};
+        let targetGLBuffer;
+        let vertexGLBuffer;
+        let vertexGLBufferAttribs = {};
 
-        var sourceBufferDataView = new DataView(sourceBuffer);
-        var sourceBufferDataViewLength = sourceBufferDataView.byteLength;
-        var sourceBufferDataViewOffset = 0;
-        var sourceBufferDataViewStride = 50;
+        let sourceBufferDataView = new DataView(sourceBuffer);
+        let sourceBufferDataViewLength = sourceBufferDataView.byteLength;
+        let sourceBufferDataViewOffset = 0;
+        let sourceBufferDataViewStride = 50;
 
-        var vertexBufferArray;
-        var vertexBufferDataView;
-        var vertexBufferDataViewOffset = 0;
-        var vertexBufferDataViewStride = 48;
+        let vertexBufferArray;
+        let vertexBufferDataView;
+        let vertexBufferDataViewOffset = 0;
+        let vertexBufferDataViewStride = 48;
 
-        var endianess = true;
+        let endianess = true;
 
-        var vertex1 = workGroup.faceVertexs[0];
-        var vertex2 = workGroup.faceVertexs[1];
-        var vertex3 = workGroup.faceVertexs[2];
-        var faceNormal = workGroup.faceNormal;
+        let vertex1 = workGroup.faceVertexs[0];
+        let vertex2 = workGroup.faceVertexs[1];
+        let vertex3 = workGroup.faceVertexs[2];
+        let faceNormal = workGroup.faceNormal;
 
-        var t;
-        var vx, vy, vz;
-        var nx, ny, nz;
-        var bounds = workGroup.bounds;
+        let t;
+        let vx, vy, vz;
+        let nx, ny, nz;
+        let bounds = workGroup.bounds;
 
         //validate file size (STL bynary head length is 80 bytes)
         if (sourceBufferDataViewLength > 80) {
@@ -517,7 +527,7 @@ var STLModelLoader = {};
              * */
 
             sourceBufferDataViewOffset = 84;
-            for (var i = 0; i < numTriangles; i++) {
+            for (let i = 0; i < numTriangles; i++) {
 
                 //load file data from buffer
                 //////////////////////////////////////////
@@ -686,14 +696,14 @@ var STLModelLoader = {};
      * @returns {Array}
      */
     STLModelLoader.getLineWords = function (srcLine) {
-        var length = srcLine.length;
-        var words = new Array();
+        let length = srcLine.length;
+        let words = new Array();
 
-        var character = '';
-        var word = '';
+        let character = '';
+        let word = '';
 
         //parse each character of source string
-        for (var i = 0; i < length; i++) {
+        for (let i = 0; i < length; i++) {
             switch (character = srcLine[i]) {
                 case ' ':
 
@@ -734,11 +744,11 @@ var STLModelLoader = {};
         beginIndex !== undefined || (beginIndex = 0);
         endIndex !== undefined || (endIndex = words.length);
 
-        var joinedLine = '';
-        var lastWordIndex = endIndex - 1;
+        let joinedLine = '';
+        let lastWordIndex = endIndex - 1;
 
         //join any words starting be word on begin index
-        for (var i = beginIndex; i < endIndex; i++) {
+        for (let i = beginIndex; i < endIndex; i++) {
             joinedLine += (i < lastWordIndex) ? words[i] + ' ' : words[i];
         }
 
@@ -759,21 +769,21 @@ var STLModelLoader = {};
      * @returns {Array [3] | params.outputVector}
      */
     STLModelLoader.computeFaceNormal = function (p1, p2, p3, outputVector) {
-        var length;
+        let length;
 
         //compute three face points diferenece
-        var v0x = p1[0] - p2[0];
-        var v0y = p1[1] - p2[1];
-        var v0z = p1[2] - p2[2];
+        let v0x = p1[0] - p2[0];
+        let v0y = p1[1] - p2[1];
+        let v0z = p1[2] - p2[2];
 
-        var v1x = p3[0] - p2[0];
-        var v1y = p3[1] - p2[1];
-        var v1z = p3[2] - p2[2];
+        let v1x = p3[0] - p2[0];
+        let v1y = p3[1] - p2[1];
+        let v1z = p3[2] - p2[2];
 
         //compute vectors values cross product
-        var nx = v0y * v1z - v0z * v1y;
-        var ny = v0z * v1x - v0x * v1z;
-        var nz = v0x * v1y - v0y * v1x;
+        let nx = v0y * v1z - v0z * v1y;
+        let ny = v0z * v1x - v0x * v1z;
+        let nz = v0x * v1y - v0y * v1x;
 
         //compute length of vector to normalize it
         length = Math.sqrt(nx * nx + ny * ny + nz * nz);
@@ -817,11 +827,11 @@ var STLModelLoader = {};
          *  Exp: models/model_1/model_1.obj 
          *  --> [models, model_1, model_1.obj]
          */
-        var words = url.split('/');
-        var fileInfo;
-        var root;
-        var name;
-        var extension;
+        let words = url.split('/');
+        let fileInfo;
+        let root;
+        let name;
+        let extension;
         
         // get file path excluding fileName and join be backslash another words
         root = words.slice(0, words.length - 1).join('/');
@@ -858,7 +868,7 @@ var STLModelLoader = {};
      * @returns {Number}
      */
     STLModelLoader.parseFloat = function (value, defaultValue) {
-        var number;
+        let number;
         return value !== undefined && !isNaN(number = parseFloat(value)) ? number : defaultValue;
     };
     
@@ -871,9 +881,9 @@ var STLModelLoader = {};
      * @returns {String}
      */
     STLModelLoader.parseByteScale = function (byteLength) {
-        var integer;
-        var decimal;
-        var byteScale;
+        let integer;
+        let decimal;
+        let byteScale;
 
         byteLength || (byteLength = 0);
 
@@ -931,13 +941,13 @@ var STLModelLoader = {};
      * @returns {ArrayBuffer}
      */
     STLModelLoader.parseTextToStreamArray = function (sourceText) {
-        var length = sourceText.length;
+        let length = sourceText.length;
         
-        var arrayBuffer = new ArrayBuffer(length);
-        var arrayBufferView = new DataView(arrayBuffer);
+        let arrayBuffer = new ArrayBuffer(length);
+        let arrayBufferView = new DataView(arrayBuffer);
 
         //get any bytes
-        for (var i = 0, l = length; i < l; i++) {
+        for (let i = 0, l = length; i < l; i++) {
             arrayBufferView.setUint8(i, sourceText.charCodeAt(i) & 0xff);
         }
 
@@ -953,8 +963,8 @@ var STLModelLoader = {};
      * @returns { Object }
      */
     STLModelLoader.createNewWorkGroup = function (gl, scale) {
-        var workGroup = {};
-        var faceVertexs;
+        let workGroup = {};
+        let faceVertexs;
 
         //define worked values
         workGroup.gl = gl;
@@ -1012,8 +1022,8 @@ var STLModelLoader = {};
      */
     STLModelLoader.storeFaceTriangle = function (workGroup, faceNormal, vertex1, vertex2, vertex3) {
 
-        var buffer = workGroup.vertexBuffer;
-        var length = buffer.length;
+        let buffer = workGroup.vertexBuffer;
+        let length = buffer.length;
 
         //store vertex normal
         buffer[length] = faceNormal[0];
@@ -1079,24 +1089,24 @@ var STLModelLoader = {};
      */
     STLModelLoader.storeVertexBuffer = function (workGroup) {
 
-        var gl = workGroup.gl;
-        var numTriangles = workGroup.numFacetTriangles;
-        var numVertexs = numTriangles * 3;
+        let gl = workGroup.gl;
+        let numTriangles = workGroup.numFacetTriangles;
+        let numVertexs = numTriangles * 3;
 
-        var targetGLBuffer;
-        var vertexGLBuffer;
-        var vertexGLBufferAttribs = {};
+        let targetGLBuffer;
+        let vertexGLBuffer;
+        let vertexGLBufferAttribs = {};
 
-        var vertexBufferArray = workGroup.vertexBuffer;
-        var vertexBufferArrayOffset = 0;
-        var vertexBufferArrayStride = 12;
+        let vertexBufferArray = workGroup.vertexBuffer;
+        let vertexBufferArrayOffset = 0;
+        let vertexBufferArrayStride = 12;
 
-        var vertexBufferArrayBuffer = null;
-        var vertexBufferDataView = null;
-        var vertexBufferDataViewOffset = 0;
-        var vertexBufferDataViewStride = 48;
+        let vertexBufferArrayBuffer = null;
+        let vertexBufferDataView = null;
+        let vertexBufferDataViewOffset = 0;
+        let vertexBufferDataViewStride = 48;
 
-        var nx, ny, nz;
+        let nx, ny, nz;
 
         //create output buffer
         vertexBufferArrayBuffer = new ArrayBuffer(numTriangles * vertexBufferDataViewStride);
@@ -1104,7 +1114,7 @@ var STLModelLoader = {};
 
         //store data on buffer
         ///////////////////////////////////////
-        for (var i = 0; i < numTriangles; i++) {
+        for (let i = 0; i < numTriangles; i++) {
 
             //get face normal
             nx = vertexBufferArray[vertexBufferArrayOffset + 0] * 0x7F;
@@ -1193,7 +1203,7 @@ var STLModelLoader = {};
      * @returns {STLModelLoader.STLModel}
      */
     STLModelLoader.buildSTLModel = function (workGroup) {
-        var model = new STLModelLoader.STLModel();
+        let model = new STLModelLoader.STLModel();
         
         // store model values
         model.name = workGroup.name;
@@ -1216,8 +1226,8 @@ var STLModelLoader = {};
 
     STLModelLoader.showStats = function (workGroup) {
 
-        var numVertexs = workGroup.vertexBuffer.vertexsNumber;
-        var stats = 'STL Model Loaded Stats: \n\t{\n';
+        let numVertexs = workGroup.vertexBuffer.vertexsNumber;
+        let stats = 'STL Model Loaded Stats: \n\t{\n';
 
         stats += '\t\t name: ' + workGroup.name + '\n';
         stats += '\t\t vertexs: ' + numVertexs + '\n';
@@ -1260,20 +1270,20 @@ var STLModelLoader = {};
      */
     STLModelLoader.getSTLRenderShader = function (gl) {
 
-        var vertexShader;
-        var vertexShaderSource;
-        var vertexShaderInfo;
+        let vertexShader;
+        let vertexShaderSource;
+        let vertexShaderInfo;
 
-        var fragmentShader;
-        var fragmentShaderSource;
-        var fragmentShaderInfo;
+        let fragmentShader;
+        let fragmentShaderSource;
+        let fragmentShaderInfo;
 
-        var shaderProgram;
-        var shaderProgramInfo;
-        var isLinkedProgram;
+        let shaderProgram;
+        let shaderProgramInfo;
+        let isLinkedProgram;
 
-        var shaderAttribs;
-        var shaderUniforms;
+        let shaderAttribs;
+        let shaderUniforms;
 
         //create render shader
         if (!STLModelLoader.RENDER_SHADER) {
@@ -1454,7 +1464,7 @@ var STLModelLoader = {};
 
                     //get shader ligths uniforms structs reference
                     shaderUniforms.ligths = new Array(8);
-                    for (var i = 0, structure; i < 8; i++) {
+                    for (let i = 0, structure; i < 8; i++) {
                         structure = 'ligths[' + i + ']';
                         shaderUniforms.ligths[i] = {
                             enable: gl.getUniformLocation(shaderProgram, structure + '.enable'),
@@ -1608,7 +1618,7 @@ var STLModelLoader = {};
      * @returns {Float32Array[3]}
      */
     STLModelLoader.Material.Color = function (clonedColor) {
-        var color = new Float32Array(4);
+        let color = new Float32Array(4);
 
         Object.defineProperty(color, 'red', {
             configurable: false,
@@ -1679,7 +1689,7 @@ var STLModelLoader = {};
      * @returns {Float32Array[4]}
      */
     STLModelLoader.Material.Sampler = function (clonedSampler) {
-        var sampler = clonedSampler || new Float32Array(4);
+        let sampler = clonedSampler || new Float32Array(4);
 
         Object.defineProperty(sampler, 's', {
             configurable: false,
@@ -1799,19 +1809,19 @@ var STLModelLoader = {};
             return;
 
         //buffer values
-        var vertexBuffer = this.vertexBuffer;
-        var vertexAttribs = this.vertexBuffer.vertexAttribs;
+        let vertexBuffer = this.vertexBuffer;
+        let vertexAttribs = this.vertexBuffer.vertexAttribs;
 
         //shader elements vars
-        var shaderAttribs = shader.attribs;
-        var shaderUniforms = shader.uniforms;
+        let shaderAttribs = shader.attribs;
+        let shaderUniforms = shader.uniforms;
 
         //attribs asignation vars
-        var vertexStride = this.vertexBuffer.vertexStride;
-        var vertexAttrib = null;
-        var shaderAttrib = null;
+        let vertexStride = this.vertexBuffer.vertexStride;
+        let vertexAttrib = null;
+        let shaderAttrib = null;
 
-        var color;
+        let color;
 
         //LINK BUFFER TO ATTRIBs LOCATIONs
         /////////////////////////////////////////////////////////
@@ -1930,22 +1940,22 @@ var STLModelLoader = {};
     STLModelLoader.STLModel.prototype.executeDrawCalls = function (gl, preserveDrawCalls) {
 
         //model resources
-        var shaderUniforms = this.shader.uniforms;
+        let shaderUniforms = this.shader.uniforms;
 
         //model draw vars
-        var vertexsNumber = this.vertexBuffer.vertexsNumber;
+        let vertexsNumber = this.vertexBuffer.vertexsNumber;
 
         //draw calls vars
-        var drawCalls = this.drawCalls;
-        var drawCallsNumber = this.drawCallsNumber;
-        var instance = null;
+        let drawCalls = this.drawCalls;
+        let drawCallsNumber = this.drawCallsNumber;
+        let instance = null;
 
         //draw prepared model
         if (this.prepared) {
 
             //draw each instance call's
             //////////////////////////////////////////////////////////
-            for (var i = 0; i < drawCallsNumber; i++) {
+            for (let i = 0; i < drawCallsNumber; i++) {
                 instance = drawCalls[i];
                 
                 //send instance state uniforms to shader
