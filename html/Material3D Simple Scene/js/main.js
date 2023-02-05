@@ -238,7 +238,7 @@ function drawScene() {
     //UPDATE OBJECTS
     object1.rotation.x++;
     object1.update();
-
+    
     object2.rotation.y++;
     object2.update();
 
@@ -277,7 +277,7 @@ function drawScene() {
     MATHGL.VECTOR.rotateY(vect, 1, false);
     MATHGL.VECTOR.rotateX(vect, -1, false);
     frameCamera.update();
-
+    outputCamera.update();
 
 }
 

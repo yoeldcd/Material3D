@@ -4,12 +4,12 @@ if (!window.M3D) {
     window.M3D.Model = new Function();
     window.M3D.Model.Instance = new Function();
     window.M3D.Model.Material = new Function();
-
 }
 
 (function () {
     let elementID = 0;
     let M3Dp = {};  //private context object
+    let M3D = window.M3D;
 
     let vecIn = new Float32Array(3);
     let vecAt = new Float32Array(3);
@@ -52,6 +52,29 @@ if (!window.M3D) {
         }
 
         return dst;
+    }
+
+    function orbiteVec3(vec, alpha, omega) {
+
+        let s, c, t;
+
+        // rotate around Y
+        s = Math.sin(omega);
+        c = Math.cos(omega);
+        
+        t = vec.y
+        vec.y = t * c - vec.z * s;
+        vec.z = t * s + vec.z * c;
+
+        // rotate around X
+        t = vec.x;
+        s = Math.sin(alpha);
+        c = Math.cos(alpha);
+        
+        vec.x = vec.z * s + t * c;
+        vec.z = vec.z * c - t * s;
+
+        return vec;
     }
 
     function invertMat4(matrix, dstMatrix, returnInverseTranspose) {
@@ -183,7 +206,7 @@ if (!window.M3D) {
 
         return matrix;
     }
-    
+
     function perspectiveMat4(matrix, fieldOfView, ratio, znear, zfar) {
 
         fieldOfView = fieldOfView / 180 * Math.PI;
@@ -626,7 +649,7 @@ if (!window.M3D) {
 
     //Vector
     ////////////////////////////////////////////////////////////////////////////
-    M3D.Vector = function(x, y, z, w){
+    M3D.Vector = function (x, y, z, w) {
         this.x = x || 0;
         this.y = y || 0;
         this.z = z || 0;
@@ -769,7 +792,7 @@ if (!window.M3D) {
 
         //define node links
         node.list = this;               //redefine node list
-        if(this.head){
+        if (this.head) {
             node.before = this.last;    //last node is before 
             this.last.next = node;      //node is after last
 
@@ -804,7 +827,7 @@ if (!window.M3D) {
             (node === this.head) && (this.head = next);    //change list head node
             (node === this.last) && (this.last = before);  //change list last node
 
-            if(this.size === 0 && this.head){
+            if (this.size === 0 && this.head) {
                 console.error(before, ' => ', node, ' => ', next);
                 console.error(node === this.head ? 'node are head' : 'node are not head');
                 throw new Error('STRUCTURE ERROR');
@@ -1093,10 +1116,10 @@ if (!window.M3D) {
         this.updated = true;
     };
 
-    M3D.Camera.prototype.setDirection2Object = function(obj){
+    M3D.Camera.prototype.setDirection2Object = function (obj) {
         let x, y, z, length;
 
-        if(obj instanceof M3D.Object) {
+        if (obj instanceof M3D.Object) {
             x = this.coords.x - obj.coords.x;
             y = this.coords.y - obj.coords.y;
             z = this.coords.z - obj.coords.z;
@@ -1242,7 +1265,7 @@ if (!window.M3D) {
 
     //Camera : Perspective Projection class constructor and properties
     ////////////////////////////////////////////////////////////////////////////
-    M3Dp.CameraProjection = function () {};
+    M3Dp.CameraProjection = function () { };
 
     M3D.Camera.PerspectiveProjection = function (fieldOfView, ratio, znear, zfar) {
 
@@ -1343,6 +1366,227 @@ if (!window.M3D) {
         this.updated = false;
     };
 
+    //Camera: Orbital location controller
+    M3D.Camera.OrbitalMouseController = function (camera, screenWidth, screenHeight) {
+
+        let self = this;
+
+        this.beforeX = 0;
+        this.beforeY = 0;
+        this.beforeV = 0;
+
+        this.dist = 10;
+        this.alpha = 0;
+        this.omega = 0;
+        this.useRadians = true;
+
+        defineUneditableProperty(this, 'center', new M3D.Vector(0, 0, 0, 0));
+
+        this.camera = camera;
+        this.screenWidth = screenWidth || 0;
+        this.screenHeight = screenHeight || 0;
+
+        this.alphaSpeed = 1;
+        this.omegaSpeed = 1;
+        this.zoomSpeed = 1;
+
+        this.maxAlpha = 1.0;
+        this.maxOmega = 0.5;
+        this.maxDistance = 100;
+
+        this.minAlpha = -1.0;
+        this.minOmega = -0.5;
+        this.minDistance = 1;
+        
+        this.onorbit = function (pointerX, pointerY) {
+
+            let dx, dy;
+
+            pointerX = parseInt(pointerX / this.screenWidth * 360);
+            pointerY = parseInt(pointerY / this.screenHeight * 180);
+            
+            if (this.beforeX && this.beforeY) {
+                dx = (pointerX - this.beforeX);
+                dy = (pointerY - this.beforeY);
+                
+                if (dx || dy) {
+
+                    if (dx !== 0) {
+                        dx = (dx > 0) ? this.alphaSpeed : -this.alphaSpeed;
+
+                        //transform deg2rad if need
+                        if (this.useRadians) {
+                            dx *= (Math.PI / 180);
+                        }
+
+                        this.alpha += dx;
+
+                        //validate camera alpha
+                        if (this.alpha > this.maxAlpha || this.alpha < this.minAlpha)
+                            this.alpha -= dx;
+                    }
+
+                    if (dy !== 0) {
+                        dy = (dy > 0) ? this.omegaSpeed : -this.omegaSpeed;
+
+                        //transform deg2rad if need
+                        if (this.useRadians) {
+                            dy *= (Math.PI / 180);
+                        }
+
+                        this.omega += dy;
+
+                        //validate camera omega
+                        if (this.omega > this.maxOmega || this.omega < this.minOmega)
+                            this.omega -= dy;
+
+                    }
+
+                    M3Dp.updateCameraLocation(this)
+
+                }
+            }
+
+            this.beforeX = pointerX;
+            this.beforeY = pointerY;
+        };
+
+        this.onzoom = function (value) {
+
+            let dv, dist
+            
+            if (this.beforeV) {
+                console.log(value)
+                
+                //dv = (value - this.beforeV);
+                dv = value /100;
+                
+                if (dv) {
+                    
+                    dv = dv < 0 ? this.zoomSpeed : - this.zoomSpeed;
+                    dist = this.dist + dv;
+                    
+                    // check distance valid range
+                    if (dist <= this.maxDistance && dist >= this.minDistance) {
+                        this.dist = dist;
+                        M3Dp.updateCameraLocation(this);
+                    
+                    }
+
+                }
+                
+                
+            }
+
+            this.beforeV = value;
+        
+        };
+
+        this.onmove = function (me) {
+
+            // modify camera orbital  location
+            self.onorbit(me.clientX, me.clientY);
+
+            if (self.onupdate)
+                self.onupdate(mouseEvent, false);
+
+        };
+        
+        this.ontouch = function (te) {
+            te.preventDefault();
+
+            let touches = te.changedTouches;
+            let dx, dy, dist
+
+            if (touches.length === 1) {
+
+                // modify camera orbital location
+                self.onorbit(touches[0].clientX, touches[0].clientY);
+
+            } else {
+
+                // compute touch points distance
+                dx = touches[0].clientX - touches[1].clientX;
+                dy = touches[0].clientY - touches[1].clientY;
+                dist = Math.sqrt(dx * dx + dy * dy);
+
+                // modify camera orbital location
+                self.onzoom(dist);
+
+            }
+
+            // call update hendle
+            if (self.onupdate)
+                self.onupdate(touchEvent, true);
+
+        };
+
+        this.onwheel = function (we) {
+            // modify camera orbital distance
+            self.onzoom(we.deltaY);
+
+            // call update hendle
+            if (self.onupdate)
+                self.onupdate(touchEvent, true);
+
+        };
+
+    }
+
+
+
+    M3Dp.updateCameraLocation = function (controller) {
+
+        let loc = new M3D.Vector(0, 0, controller.dist);
+
+        // compute relative orbital location
+        orbiteVec3(loc, controller.alpha, controller.omega)
+
+        // move orbital position relative to center
+        loc.x += controller.center.x;
+        loc.y += controller.center.y;
+        loc.z += controller.center.z;
+
+        // update camera parameters
+        controller.camera.setCoords(loc.x, loc.y, loc.z)
+        controller.camera.setTargetCoords(controller.center.x, controller.center.y, controller.center.z)
+        
+    }
+
+    M3D.Camera.OrbitalMouseController.prototype.configureTouchEvents = function (target, enable) {
+
+        if (enable) {
+            // configure screen size
+            this.screenWidth = this.screenWidth || target.width || 0;
+            this.screenHeight = this.screenHeight || target.height || 0;
+
+            target.addEventListener('touchmove', this.ontouch);
+
+        } else {
+            target.removeEventListener('touchmove', this.ontouch);
+        }
+
+    }
+
+    M3D.Camera.OrbitalMouseController.prototype.configureMouseEvents = function (target, enable) {
+
+
+        if (enable) {
+            // configure screen size
+            this.screenWidth = this.screenWidth || target.width || 0;
+            this.screenHeight = this.screenHeight || target.height || 0;
+
+            target.addEventListener('mousemove', this.onmove);
+            target.addEventListener('mousewheel', this.onwheel);
+
+        } else {
+            target.removeEventListener('mousemove', this.onmove);
+            target.removeEventListener('mousewheel', this.onwheel);
+
+        }
+
+    }
+
     //Ligth class constructor and properties
     ////////////////////////////////////////////////////////////////////////////
     M3D.Ligth = function (name, type, x, y, z, r, g, b) {
@@ -1409,10 +1653,10 @@ if (!window.M3D) {
         this.updated = true;
     };
 
-    M3D.Ligth.prototype.setDirection2Object = function(obj){
+    M3D.Ligth.prototype.setDirection2Object = function (obj) {
         let x, y, z, length;
 
-        if(obj instanceof M3D.Object) {
+        if (obj instanceof M3D.Object) {
             x = this.coords.x - obj.coords.x;
             y = this.coords.y - obj.coords.y;
             z = this.coords.z - obj.coords.z;
@@ -1542,7 +1786,7 @@ if (!window.M3D) {
                 gl.uniform1f(ligthStruct.ratio, this.ratio);
                 gl.uniform1i(ligthStruct.spot, 1);
 
-                gl.uniform3fv(ligthStruct.direction, this.invDirection);        
+                gl.uniform3fv(ligthStruct.direction, this.invDirection);
                 gl.uniform1i(ligthStruct.spot, 0);
                 //gl.uniform1f(ligthStruct.maxDot, -1);
 
@@ -1656,7 +1900,7 @@ if (!window.M3D) {
             // define object controller
             this.controller = new M3D.Controller(controller);
             this.controller.initialize(this);
-            
+
         }
 
     };
@@ -1834,11 +2078,11 @@ if (!window.M3D) {
     };
 
     M3D.Object.prototype.draw = function () {
-        
+
         this.visible && this.model.sendDrawCall();
 
     };
-    
+
     M3Dp.Object.updateHerarchy = function () {
 
         let stack = this.stack;
@@ -1881,7 +2125,7 @@ if (!window.M3D) {
                 //Update object
                 ////////////////////////////////////////////////////////////////
 
-              
+
                 //get object transform matrix's
                 localTransformMatrix = object.localMatrix;
                 finalTransformMatrix = object.finalMatrix;
@@ -1895,8 +2139,8 @@ if (!window.M3D) {
                 scale = object.scale;
 
                 //emulate entity controller
-                if (controller){
-                    if(controller.initialized)
+                if (controller) {
+                    if (controller.initialized)
                         controller.update(object);
                     else
                         controller.initialized = true;
@@ -1904,7 +2148,7 @@ if (!window.M3D) {
 
                 //get update state <~~~~ FIX IT
                 updated = object.updated;
-                
+
                 if (updated) {
 
                     //re-compute object local transform matrix
@@ -1952,7 +2196,7 @@ if (!window.M3D) {
                     parentTransformMatrix = parent.finalMatrix;
 
                 }
-                
+
                 object.updated = false;
 
             } else {
@@ -1974,13 +2218,13 @@ if (!window.M3D) {
         let finalTransformMatrix = this.finalMatrix;
 
         //emulate entity controller
-        if (this.controller){
-            if(this.controller.initialized)
+        if (this.controller) {
+            if (this.controller.initialized)
                 this.controller.update(this);
             else
                 this.controller.initialized = true;
         }
-        
+
         // update object values
         if (this.updated) {
             this.updated = false;
@@ -2007,7 +2251,7 @@ if (!window.M3D) {
     ////////////////////////////////////////////////////////////////////////////
     M3D.Controller = function (controller) {
 
-        if(controller){
+        if (controller) {
             // asign cloned controller event hadlers
             this.initialize = controller.initialize;
             this.update = controller.update;
@@ -2024,24 +2268,24 @@ if (!window.M3D) {
         this.initialized = false;
     };
 
-    M3D.Controller.prototype.initialize = function () {};
+    M3D.Controller.prototype.initialize = function () { };
 
-    M3D.Controller.prototype.reset = function () {};
+    M3D.Controller.prototype.reset = function () { };
 
-    M3D.Controller.prototype.update = function () {};
+    M3D.Controller.prototype.update = function () { };
 
     //Geometry class constructor
     ////////////////////////////////////////////////////////////////////////////
-    M3D.Geometry = function () {};
+    M3D.Geometry = function () { };
 
-    M3D.Geometry.hasBox2BoxColition = function(box1, box2){
+    M3D.Geometry.hasBox2BoxColition = function (box1, box2) {
         return box1.left <= box2.rigth && box1.rigth >= box2.left
-        && box1.down <= box2.up && box1.up >= box2.down
-        && box1.zfar <= box2.znear && box1.znear >= box2.zfar;
-        
+            && box1.down <= box2.up && box1.up >= box2.down
+            && box1.zfar <= box2.znear && box1.znear >= box2.zfar;
+
     }
 
-    M3D.Geometry.hasSphere2SphereColition = function(sphere1, sphere){
+    M3D.Geometry.hasSphere2SphereColition = function (sphere1, sphere) {
 
         //compute axis distance
         let d = other.center[0] - this.center[0];
@@ -2058,7 +2302,7 @@ if (!window.M3D) {
 
     };
 
-    M3D.Geometry.hasBox2SphereColition = function(box, sphere){
+    M3D.Geometry.hasBox2SphereColition = function (box, sphere) {
 
         let dx = other.center[0] - this.center[0];
         let dy = other.center[1] - this.center[1];
@@ -2131,7 +2375,7 @@ if (!window.M3D) {
     M3D.Box.prototype.update = function (object) {
 
         //get bounds center
-        
+
         //compute X axis edges
         let coord = this.center[0] = object.coords[0];
         let semivalue = this.dimensions.width / 2;
@@ -2149,9 +2393,9 @@ if (!window.M3D) {
         semivalue = this.dimensions.depth / 2;
         this.znear = coord + semivalue;
         this.zfar = coord - semivalue;
-        
+
     };
-    
+
     //Sphere class constructor and properties
     ////////////////////////////////////////////////////////////////////////////
     M3D.Sphere = function (ratio) {
@@ -2182,7 +2426,7 @@ if (!window.M3D) {
 
     //Render Shader Factory class constructor and properties
     ////////////////////////////////////////////////////////////////////////////
-    M3D.RenderShaderFactory = function () {};
+    M3D.RenderShaderFactory = function () { };
 
     M3D.RenderShaderFactory.requestAsync = false;
 
@@ -2358,7 +2602,7 @@ if (!window.M3D) {
 
     //Render Shader class constructor and properties
     ////////////////////////////////////////////////////////////////////////////
-    M3Dp.RenderShader = function () {};
+    M3Dp.RenderShader = function () { };
 
     M3Dp.RenderShader.addAttrib = function (name, attribName) {
         this.attribs[name] = this.gl.getAttribLocation(this, attribName);
@@ -3096,7 +3340,7 @@ if (!window.M3D) {
                 // get current frame miliseconds time
                 ntime = new Date().getTime();
 
-                if(animator.time === 0)
+                if (animator.time === 0)
                     //use initial 0 frame time
                     animator.delta = 0;
                 else
@@ -3459,8 +3703,8 @@ if (!window.M3D) {
         window.msRequestAnimationFrame ||
         window.opRequestAnimationFrame ||
         function (callback) {
-        return window.setTimeout(callback, 40);
-    };
+            return window.setTimeout(callback, 40);
+        };
 
     window.cancelAnimationFrame = window.cancelAnimationFrame ||
         window.webkitCancelAnimationFrame ||

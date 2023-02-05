@@ -314,7 +314,7 @@ function Ligth() {
         c = cos(omega);
         v1 = dist * s;
         v2 = dist * c;
-
+        
         //rotate around Y
         s = sin(alpha);
         c = cos(alpha);
@@ -327,8 +327,8 @@ function Ligth() {
         object.z = v2;
 
     }
-
-
+    
+    
     function CameraControl(camera, screenWidth, screenHeight) {
 
         var beforeX = 0;
@@ -353,7 +353,7 @@ function Ligth() {
         this.maxAlpha = 99999999999;
         this.maxOmega = 89;
         this.maxDistance = 100;
-
+        
         this.minAlpha = -99999999999;
         this.minOmega = -89;
         this.minDistance = 1;
@@ -485,7 +485,7 @@ function Ligth() {
 
         return listener;
     };
-
+    
     CameraControl.prototype.createZoomEvent = function (target, eventHandler, isTouchEvent) {
         var self = this;
         var listener;
@@ -691,7 +691,7 @@ function Ligth() {
         this.x += (this.atx || 0);
         this.y += (this.aty || 0);
         this.z += (this.atz || 0);
-
+        
         this.update();
     };
 
@@ -724,7 +724,7 @@ function Ligth() {
         this.x += targetX;
         this.y += targetX;
         this.z += targetX;
-
+        
         this.computeDirection();
     };
 

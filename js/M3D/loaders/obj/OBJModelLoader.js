@@ -20,13 +20,13 @@ if (!window.M3D) {
 
 }
 
-var OBJModelLoader = {};
+let OBJModelLoader = {};
 
 (function () {
-    var identityMatrix = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+    let identityMatrix = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
     
-    var OBJGeneratedModelID = 62671000;
-    var OBJGeneratedInstanceID = 62671000;
+    let OBJGeneratedModelID = 62671000;
+    let OBJGeneratedInstanceID = 62671000;
 
     function Rectangle(x, y, w, h) {
         this.x = x || 0;
@@ -175,25 +175,25 @@ var OBJModelLoader = {};
      */
     OBJModelLoader.loadOBJFile = function (gl, url, scale, responseID) {
 
-        var async = this.requestAsync;
-        var user = this.requestUser;
-        var password = this.requestPassword;
+        let async = this.requestAsync;
+        let user = this.requestUser;
+        let password = this.requestPassword;
 
-        var responseCallback = this.onload;
-        var errorCallback = this.onerror || this.onload;
+        let responseCallback = this.onload;
+        let errorCallback = this.onerror || this.onload;
 
-        var self = this;
-        var timerID = 'Loading model on url ' + url + ' ';
+        let self = this;
+        let timerID = 'Loading model on url ' + url + ' ';
 
         //get file request settings
-        var fileInfo = this.parseFileInfo(url);
+        let fileInfo = this.parseFileInfo(url);
         fileInfo.async = async;
         fileInfo.user = user;
         fileInfo.password = password;
 
         //make HXR object
-        var XHR = new XMLHttpRequest();
-        var response = null;
+        let XHR = new XMLHttpRequest();
+        let response = null;
 
         XHR.onload = function () {
 
@@ -204,7 +204,7 @@ var OBJModelLoader = {};
             console.timeEnd(timerID);
 
             // make workGroup and parse file model data
-            var workGroup = self.createNewWorkGroup(gl, fileInfo, this.responseText, scale);
+            let workGroup = self.createNewWorkGroup(gl, fileInfo, this.responseText, scale);
             OBJModelLoader.parseOBJText(gl, null, 1.0, workGroup);
             OBJModelLoader.buildOBJModel(workGroup);
 
@@ -247,19 +247,19 @@ var OBJModelLoader = {};
      */
     OBJModelLoader.loadOBJFilesGroup = function (gl, urls, scale, responseID) {
 
-        var url = null;
-        var index = 1;
-        var length = urls.length;
+        let url = null;
+        let index = 1;
+        let length = urls.length;
 
-        var timerID = null;
+        let timerID = null;
 
-        var XHR;
-        var fileInfo;
-        var fileText;
+        let XHR;
+        let fileInfo;
+        let fileText;
 
-        var workGroup = OBJModelLoader.createNewWorkGroup(gl, {}, "", scale);
-        var responseCallback = OBJModelLoader.onload;
-        var model = null;
+        let workGroup = OBJModelLoader.createNewWorkGroup(gl, {}, "", scale);
+        let responseCallback = OBJModelLoader.onload;
+        let model = null;
 
         if (!OBJModelLoader.requestAsync) {
 
@@ -333,15 +333,15 @@ var OBJModelLoader = {};
         if (!workGroup)
             workGroup = this.createNewWorkGroup(gl, {/* NOT FIle Info */ }, sourceOBJText, scale);
 
-        var lines = workGroup.textLines;
-        var linesNumber = lines.length;
-        var lineWords = null;
+        let lines = workGroup.textLines;
+        let linesNumber = lines.length;
+        let lineWords = null;
 
         //initialize parsing time counter
         console.time('Parsing Time');
 
         //parse each lines of source text
-        for (var i = 0; i < linesNumber; i++) {
+        for (let i = 0; i < linesNumber; i++) {
             lineWords = this.getLineWords(lines[i]);
 
             //discart empty or unvalids lines lines
@@ -367,7 +367,7 @@ var OBJModelLoader = {};
      */
     OBJModelLoader.createNewWorkGroup = function (gl, fileInfo, sourceText, scale) {
 
-        var workGroup = new Object();
+        let workGroup = new Object();
 
         //self references
         workGroup.gl = gl;
@@ -453,7 +453,7 @@ var OBJModelLoader = {};
         workGroup.indexedStructuresStorage = new Array(16);
 
         //initialize usables objects cache
-        for (var i = 0; i < 16; i++) {
+        for (let i = 0; i < 16; i++) {
             workGroup.vertexsStructuresStorage[i] = {
                 vertexCoords: new Float32Array(3),
                 vertexNormal: new Float32Array(3),
@@ -520,14 +520,14 @@ var OBJModelLoader = {};
      * @returns {Array}
      */
     OBJModelLoader.getLineWords = function (srcLine) {
-        var length = srcLine.length;
-        var words = new Array();
+        let length = srcLine.length;
+        let words = new Array();
 
-        var character = '';
-        var word = '';
+        let character = '';
+        let word = '';
 
         //parse each character of source string
-        for (var i = 0; i < length; i++) {
+        for (let i = 0; i < length; i++) {
             switch (character = srcLine[i]) {
                 case ' ':
 
@@ -568,11 +568,11 @@ var OBJModelLoader = {};
         beginIndex !== undefined || (beginIndex = 0);
         endIndex !== undefined || (endIndex = words.length);
 
-        var joinedLine = '';
-        var lastWordIndex = endIndex - 1;
+        let joinedLine = '';
+        let lastWordIndex = endIndex - 1;
 
         //join any words starting be word on begin index
-        for (var i = beginIndex; i < endIndex; i++) {
+        for (let i = beginIndex; i < endIndex; i++) {
             joinedLine += (i < lastWordIndex) ? words[i] + ' ' : words[i];
         }
 
@@ -593,21 +593,21 @@ var OBJModelLoader = {};
      * @returns {Array [3] | params.outputVector}
      */
     OBJModelLoader.computeFaceNormal = function (p1, p2, p3, outputVector) {
-        var length;
+        let length;
 
         //compute three face points diferenece
-        var v0x = p1[0] - p2[0];
-        var v0y = p1[1] - p2[1];
-        var v0z = p1[2] - p2[2];
+        let v0x = p1[0] - p2[0];
+        let v0y = p1[1] - p2[1];
+        let v0z = p1[2] - p2[2];
 
-        var v1x = p3[0] - p2[0];
-        var v1y = p3[1] - p2[1];
-        var v1z = p3[2] - p2[2];
+        let v1x = p3[0] - p2[0];
+        let v1y = p3[1] - p2[1];
+        let v1z = p3[2] - p2[2];
 
         //compute vectors values cross product
-        var nx = v0y * v1z - v0z * v1y;
-        var ny = v0z * v1x - v0x * v1z;
-        var nz = v0x * v1y - v0y * v1x;
+        let nx = v0y * v1z - v0z * v1y;
+        let ny = v0z * v1x - v0x * v1z;
+        let nz = v0x * v1y - v0y * v1x;
 
         //normalize vector values if is posible
         length = Math.sqrt(nx * nx + ny * ny + nz * nz);
@@ -649,11 +649,11 @@ var OBJModelLoader = {};
          *  Exp: models/model_1/model_1.obj 
          *  --> [models, model_1, model_1.obj]
          */
-        var words = url.split('/');
-        var fileInfo;
-        var root;
-        var name;
-        var extension;
+        let words = url.split('/');
+        let fileInfo;
+        let root;
+        let name;
+        let extension;
 
         // get file path excluding fileName and join be backslash another words
         root = words.slice(0, words.length - 1).join('/');
@@ -690,7 +690,7 @@ var OBJModelLoader = {};
      * @returns {Number}
      */
     OBJModelLoader.parseInt = function (value, defaultValue) {
-        var number;
+        let number;
         return value !== undefined && !isNaN(number = parseInt(value)) ? number : defaultValue;
     };
 
@@ -703,7 +703,7 @@ var OBJModelLoader = {};
      * @returns {Number}
      */
     OBJModelLoader.parseFloat = function (value, defaultValue) {
-        var number;
+        let number;
         return value !== undefined && !isNaN(number = parseFloat(value)) ? number : defaultValue;
     };
 
@@ -716,9 +716,9 @@ var OBJModelLoader = {};
      * @returns {String}
      */
     OBJModelLoader.parseByteScale = function (byteLength) {
-        var integer;
-        var decimal;
-        var byteScale;
+        let integer;
+        let decimal;
+        let byteScale;
 
         byteLength || (byteLength = 0);
 
@@ -763,7 +763,7 @@ var OBJModelLoader = {};
      */
     OBJModelLoader.parseIndexedStructure = function (word, struct) {
 
-        var structFields = word.split('/');
+        let structFields = word.split('/');
 
         //parse one indexed struct (v, v/n/t , v//t , v/n)
         struct.vertexIndex = this.parseInt(structFields[0], NaN);
@@ -794,7 +794,7 @@ var OBJModelLoader = {};
      * @returns {undefined}
      */
     OBJModelLoader.parseOBJLine = function (workGroup, words) {
-        var command = words[0];
+        let command = words[0];
 
         switch (command) {
             case 'v':
@@ -870,7 +870,7 @@ var OBJModelLoader = {};
      */
     OBJModelLoader.createNewOBJObject = function (workGroup, objectName) {
 
-        var object = workGroup.currentObject;
+        let object = workGroup.currentObject;
 
         if (object)
             //save last created object
@@ -938,11 +938,11 @@ var OBJModelLoader = {};
      * @returns {undefined}
      */
     OBJModelLoader.storeLoadedVertexCoords = function (workGroup, words) {
-        var length = workGroup.loadedVertexCoords.length;
-        var vx = this.parseFloat(words[1], 0.0) * workGroup.scale;
-        var vy = this.parseFloat(words[2], 0.0) * workGroup.scale;
-        var vz = this.parseFloat(words[3], 0.0) * workGroup.scale;
-        var t;
+        let length = workGroup.loadedVertexCoords.length;
+        let vx = this.parseFloat(words[1], 0.0) * workGroup.scale;
+        let vy = this.parseFloat(words[2], 0.0) * workGroup.scale;
+        let vz = this.parseFloat(words[3], 0.0) * workGroup.scale;
+        let t;
 
         if (workGroup.invertZtoYAxis) {
             //compute inverted axis values
@@ -970,11 +970,11 @@ var OBJModelLoader = {};
      * @returns {undefined}
      */
     OBJModelLoader.storeLoadedVertexNormals = function (workGroup, words) {
-        var length = workGroup.loadedVertexNormals.length;
-        var nx = this.parseFloat(words[1], 0.0);
-        var ny = this.parseFloat(words[2], 0.0);
-        var nz = this.parseFloat(words[3], 0.0);
-        var t;
+        let length = workGroup.loadedVertexNormals.length;
+        let nx = this.parseFloat(words[1], 0.0);
+        let ny = this.parseFloat(words[2], 0.0);
+        let nz = this.parseFloat(words[3], 0.0);
+        let t;
 
         if (workGroup.invertZtoYAxis) {
             //compute inverted axis values
@@ -999,9 +999,9 @@ var OBJModelLoader = {};
      * @returns {undefined}
      */
     OBJModelLoader.storeLoadedVertexTexCoords = function (workGroup, words) {
-        var length = workGroup.loadedVertexTexCoords.length;
-        var ts = this.parseFloat(words[1], 0.0);
-        var tt = this.parseFloat(words[2], 0.0);
+        let length = workGroup.loadedVertexTexCoords.length;
+        let ts = this.parseFloat(words[1], 0.0);
+        let tt = this.parseFloat(words[2], 0.0);
 
         //store vertex textel coords on dedicated storage array
         workGroup.loadedVertexTexCoords[length] = ts;
@@ -1037,7 +1037,7 @@ var OBJModelLoader = {};
      * @returns {Array | params.outputVector}
      */
     OBJModelLoader.getLoadedVertexCoords = function (workGroup, index, outputVector) {
-        var vx, vy, vz;
+        let vx, vy, vz;
 
         if (index > 0) {
             //use direct indexs methood
@@ -1103,7 +1103,7 @@ var OBJModelLoader = {};
      * @returns {Array | params.outputVector}
      */
     OBJModelLoader.getLoadedVertexNormal = function (workGroup, index, outputVector, faceNormal) {
-        var nx, ny, nz;
+        let nx, ny, nz;
 
         if (index > 0) {
             //use direct indexs methood
@@ -1165,7 +1165,7 @@ var OBJModelLoader = {};
      * @returns {Array | params.outputVector}
      */
     OBJModelLoader.getLoadedVertexTexCoords = function (workGroup, index, outputVector) {
-        var ts, tt;
+        let ts, tt;
 
         if (index > 0) {
             //use direct indexs methood
@@ -1214,17 +1214,17 @@ var OBJModelLoader = {};
      * @returns {undefined}
      */
     OBJModelLoader.addFaceData = function (workGroup, words) {
-        var numPoints = words.length - 1;
+        let numPoints = words.length - 1;
 
         //get cache objects from workGroup
-        var faceNormal = workGroup.faceNormalVector;
-        var vertexStructures = workGroup.vertexsStructuresStorage;
-        var indexedStructures = workGroup.indexedStructuresStorage;
-        var vertexStructure;
-        var indexedStructure;
+        let faceNormal = workGroup.faceNormalVector;
+        let vertexStructures = workGroup.vertexsStructuresStorage;
+        let indexedStructures = workGroup.indexedStructuresStorage;
+        let vertexStructure;
+        let indexedStructure;
 
         //parse each indexed structues of loaded face line
-        for (var i = 0; i < numPoints; i++) {
+        for (let i = 0; i < numPoints; i++) {
 
             //get structs and objects from cache or instantiate a new on it
             indexedStructure = indexedStructures[i] || (indexedStructures[i] = {
@@ -1256,14 +1256,14 @@ var OBJModelLoader = {};
         if (!workGroup.useComputedNormals) {
 
             //use loaded values from vertex normal
-            for (var i = 0; i < numPoints; i++) {
+            for (let i = 0; i < numPoints; i++) {
                 this.getLoadedVertexNormal(workGroup, indexedStructures[i].normalIndex, vertexStructures[i].vertexNormal, faceNormal);
             }
 
         } else {
 
             //use computed values from vertex normal
-            for (var i = 0; i < numPoints; i++) {
+            for (let i = 0; i < numPoints; i++) {
                 vertexStructure = vertexStructures[i];
                 vertexStructure.vertexNormal[0] = faceNormal[0];
                 vertexStructure.vertexNormal[1] = faceNormal[1];
@@ -1355,12 +1355,12 @@ var OBJModelLoader = {};
      */
     OBJModelLoader.addIndexedPoligonalFace = function (workGroup, numPoints, vertexStructures) {
 
-        var numVertexs = workGroup.numVertexs;
-        var indexBufferArray = workGroup.indexBuffer;
-        var indexsNumber = indexBufferArray.length;
+        let numVertexs = workGroup.numVertexs;
+        let indexBufferArray = workGroup.indexBuffer;
+        let indexsNumber = indexBufferArray.length;
 
         //store face vertexs on output buffer
-        for (var i = 0; i < numPoints; i++) {
+        for (let i = 0; i < numPoints; i++) {
             this.storeVertexData(workGroup, vertexStructures[i]);
         }
 
@@ -1368,7 +1368,7 @@ var OBJModelLoader = {};
         workGroup.numVertexs += numPoints;
 
         //store computed face index on buffer (cast N side's poligon in triangles)
-        for (var i = 1, arrayOffset = indexsNumber; i < numPoints - 1; i++) {
+        for (let i = 1, arrayOffset = indexsNumber; i < numPoints - 1; i++) {
             indexBufferArray[arrayOffset] = numVertexs;
             indexBufferArray[arrayOffset + 1] = numVertexs + i;
             indexBufferArray[arrayOffset + 2] = numVertexs + i + 1;
@@ -1437,7 +1437,7 @@ var OBJModelLoader = {};
     OBJModelLoader.addNotIndexedPoligonalFace = function (workGroup, numPoints, vertexStructures) {
 
         //store face vertexs on buffer (cast N side's poligon to triangles)
-        for (var i = 1; i < numPoints - 1; i++) {
+        for (let i = 1; i < numPoints - 1; i++) {
             this.storeVertexData(workGroup, vertexStructures[0]);
             this.storeVertexData(workGroup, vertexStructures[i]);
             this.storeVertexData(workGroup, vertexStructures[i + 1]);
@@ -1467,8 +1467,8 @@ var OBJModelLoader = {};
 
     OBJModelLoader.storeVertexData = function (workGroup, vertexStructure) {
 
-        var vertexBufferArray = workGroup.vertexBuffer;
-        var vertexBufferArrayLength = vertexBufferArray.length;
+        let vertexBufferArray = workGroup.vertexBuffer;
+        let vertexBufferArrayLength = vertexBufferArray.length;
 
         //store geometry coordinates
         vertexBufferArray[vertexBufferArrayLength] = vertexStructure.vertexCoords[0];
@@ -1510,14 +1510,14 @@ var OBJModelLoader = {};
      */
     OBJModelLoader.importNewMTLLibrary = function (workGroup, fileName) {
 
-        var importedMTLLibraries = workGroup.importedMTLLibraries;
-        var importedLibrariesNumber = importedMTLLibraries.length;
-        var importedLibraryPath = workGroup.rootPath + '/' + fileName;
+        let importedMTLLibraries = workGroup.importedMTLLibraries;
+        let importedLibrariesNumber = importedMTLLibraries.length;
+        let importedLibraryPath = workGroup.rootPath + '/' + fileName;
 
-        var found = false;
-        var i = 0;
+        let found = false;
+        let i = 0;
 
-        var importedLibraryPathInsencitive = importedLibraryPath.toLowerCase();
+        let importedLibraryPathInsencitive = importedLibraryPath.toLowerCase();
 
         //search for already imported MTL file (Case insencitive)
         while (!found && i < importedLibrariesNumber) {
@@ -1543,11 +1543,11 @@ var OBJModelLoader = {};
      * @returns {undefined}
      */
     OBJModelLoader.loadImportedMTLLibraries = function (workGroup) {
-        var importedLibraries = workGroup.importedMTLLibraries;
-        var importedLibrariesNumber = importedLibraries.length;
+        let importedLibraries = workGroup.importedMTLLibraries;
+        let importedLibrariesNumber = importedLibraries.length;
 
         //load each MTL library
-        for (var i = 0; i < importedLibrariesNumber; i++) {
+        for (let i = 0; i < importedLibrariesNumber; i++) {
             this.loadMTLFile(workGroup, importedLibraries[i]);
         }
 
@@ -1569,11 +1569,11 @@ var OBJModelLoader = {};
      */
     OBJModelLoader.loadMTLFile = function (workGroup, url) {
         
-        var self = this;
-        var timerID = 'Loading MTL File on URL ' + url + ' ';
+        let self = this;
+        let timerID = 'Loading MTL File on URL ' + url + ' ';
         
-        var XHR = new XMLHttpRequest();
-        var async = workGroup.requestAsync;
+        let XHR = new XMLHttpRequest();
+        let async = workGroup.requestAsync;
         
         XHR.onload = function () {
             
@@ -1586,7 +1586,7 @@ var OBJModelLoader = {};
         };
         
         XHR.onerror = function () {
-            var errorCode = this.status;
+            let errorCode = this.status;
             console.timeEnd(timerID);
             console.error('ERROR: Loading MTL File: ' + url + '\nERROR CODE: ' + errorCode);
         
@@ -1615,15 +1615,15 @@ var OBJModelLoader = {};
      */
     OBJModelLoader.parseMTLText = function (workGroup, sourceMTLText) {
 
-        var MTLTextLines = sourceMTLText.split('\n');
-        var MTLTextLinesNumber = MTLTextLines.length;
-        var MTLTextLineWords;
+        let MTLTextLines = sourceMTLText.split('\n');
+        let MTLTextLinesNumber = MTLTextLines.length;
+        let MTLTextLineWords;
 
-        var newMTLMaterial;
-        var currentMTLMaterial;
+        let newMTLMaterial;
+        let currentMTLMaterial;
 
         //parse each lines on source
-        for (var i = 0; i < MTLTextLinesNumber; i++) {
+        for (let i = 0; i < MTLTextLinesNumber; i++) {
             MTLTextLineWords = this.getLineWords(MTLTextLines[i]);
 
             if (MTLTextLineWords.length > 1) {
@@ -1676,9 +1676,9 @@ var OBJModelLoader = {};
      * @returns {OBJModelLoader.Material}
      */
     OBJModelLoader.parseMTLLine = function (workGroup, material, words) {
-        var newMaterial = null;
-        var imageURL = null;
-        var materialName;
+        let newMaterial = null;
+        let imageURL = null;
+        let materialName;
 
         switch (words[0]) {
             case 'newmtl':
@@ -1786,9 +1786,9 @@ var OBJModelLoader = {};
      */
     OBJModelLoader.createNewMTLMaterial = function (workGroup, materialName) {
 
-        var materialsList = workGroup.materials;
-        var materialIndex = materialsList.length;
-        var material;
+        let materialsList = workGroup.materials;
+        let materialIndex = materialsList.length;
+        let material;
 
         //create one new material
         material = new OBJModelLoader.Material(materialName || 'Material_' + materialIndex, this.defaultColor);
@@ -1813,9 +1813,9 @@ var OBJModelLoader = {};
      */
     OBJModelLoader.searchMTLMaterial = function (workGroup, materialName) {
 
-        var found = false;
-        var index = 0;
-        var length = workGroup.materials.length;
+        let found = false;
+        let index = 0;
+        let length = workGroup.materials.length;
 
         //search named material
         while (!found && index < length) {
@@ -1843,7 +1843,7 @@ var OBJModelLoader = {};
      * @returns {undefined}
      */
     OBJModelLoader.useMTLMaterial = function (workGroup, materialName) {
-        var material = workGroup.currentMaterial;
+        let material = workGroup.currentMaterial;
 
         if (!material || material.name !== materialName) {
 
@@ -1924,22 +1924,22 @@ var OBJModelLoader = {};
      */
     OBJModelLoader.storeVertexBufferData = function (workGroup) {
 
-        var gl = workGroup.gl;
-        var targetGLBuffer;
-        var vertexGLBuffer;
-        var vertexGLBufferAttribs = {};
+        let gl = workGroup.gl;
+        let targetGLBuffer;
+        let vertexGLBuffer;
+        let vertexGLBufferAttribs = {};
 
-        var vertexBufferArray = workGroup.vertexBuffer;
-        var vertexBufferArrayOffset = 0;
-        var vertexBufferArrayStride = 3;
+        let vertexBufferArray = workGroup.vertexBuffer;
+        let vertexBufferArrayOffset = 0;
+        let vertexBufferArrayStride = 3;
 
-        var vertexBufferArrayBuffer;
-        var vertexBufferDataView;
-        var vertexBufferDataViewOffset = 0;
-        var vertexBufferDataViewStride = 0;
+        let vertexBufferArrayBuffer;
+        let vertexBufferDataView;
+        let vertexBufferDataViewOffset = 0;
+        let vertexBufferDataViewStride = 0;
 
-        var vertexsNumber = workGroup.numVertexs;
-        var difuseColor;
+        let vertexsNumber = workGroup.numVertexs;
+        let difuseColor;
 
         //delete residual and unnessessary memory
         workGroup.loadedVertexCoords = null;
@@ -1983,7 +1983,7 @@ var OBJModelLoader = {};
         vertexBufferDataView = new DataView(vertexBufferArrayBuffer);
 
         //store buffer data
-        for (var i = 0; i < vertexsNumber; i++) {
+        for (let i = 0; i < vertexsNumber; i++) {
             vertexBufferDataViewOffset = vertexBufferDataViewStride * i;
             vertexBufferArrayOffset = vertexBufferArrayStride * i;
 
@@ -2080,17 +2080,17 @@ var OBJModelLoader = {};
      */
     OBJModelLoader.storeIndexBufferData = function (workGroup) {
 
-        var gl = workGroup.gl;
+        let gl = workGroup.gl;
 
-        var numVertexs = workGroup.numVertexs;
-        var indexsNumber = workGroup.numIndexs;
+        let numVertexs = workGroup.numVertexs;
+        let indexsNumber = workGroup.numIndexs;
 
-        var isInteger32Avaliable = gl.getExtension('OES_element_index_uint');
+        let isInteger32Avaliable = gl.getExtension('OES_element_index_uint');
 
-        var targetGLBuffer;
-        var indexGLBuffer;
-        var indexGLBufferStride = 0;
-        var indexGLBufferUnpackFormat = 0;
+        let targetGLBuffer;
+        let indexGLBuffer;
+        let indexGLBufferStride = 0;
+        let indexGLBufferUnpackFormat = 0;
 
         //unpack index buffer if need
         if (indexsNumber !== numVertexs) {
@@ -2186,8 +2186,8 @@ var OBJModelLoader = {};
      * @returns {OBJModelLoader.OBJModel}
      */
     OBJModelLoader.buildOBJModel = function (workGroup) {
-        var model = new OBJModelLoader.OBJModel();
-        var bounds = new BoundBox;
+        let model = new OBJModelLoader.OBJModel();
+        let bounds = new BoundBox;
 
         if (workGroup.currentObject)
             //save a last created OBJObject if has created
@@ -2228,7 +2228,7 @@ var OBJModelLoader = {};
         model.samplers.naSampler = workGroup.naSampler ? workGroup.naSampler.sampler : null;
 
         //compute total model geometry bounds using subgeometries bounds
-        for (var i = 0, l = model.objects.length; i < l; i++) {
+        for (let i = 0, l = model.objects.length; i < l; i++) {
             bounds.updateByBoundBox(model.objects[i].bounds);
         }
         bounds.computeCenter();
@@ -2242,16 +2242,16 @@ var OBJModelLoader = {};
     //Resources functions
     OBJModelLoader.logStats = function (workGroup) {
 
-        var numVertexs = workGroup.vertexBuffer.vertexsNumber;
-        var vertexStride = workGroup.vertexBuffer.vertexStride;
-        var vertexBufferSize = numVertexs * vertexStride;
+        let numVertexs = workGroup.vertexBuffer.vertexsNumber;
+        let vertexStride = workGroup.vertexBuffer.vertexStride;
+        let vertexBufferSize = numVertexs * vertexStride;
 
-        var numIndexs = 0;
-        var indexStride = 0;
-        var indexBufferSize = 0;
+        let numIndexs = 0;
+        let indexStride = 0;
+        let indexBufferSize = 0;
 
-        var numTriangles = 0;
-        var stats = 'OBJ Model Loaded Stats \n\t{\n';
+        let numTriangles = 0;
+        let stats = 'OBJ Model Loaded Stats \n\t{\n';
 
         stats += '\t\t file: ' + workGroup.rootPath + '/' + workGroup.fileName + '.obj,\n';
         stats += '\t\t vertexs: ' + numVertexs + ',\n';
@@ -2317,20 +2317,20 @@ var OBJModelLoader = {};
      */
     OBJModelLoader.getOBJRenderShader = function (gl) {
 
-        var vertexShader;
-        var vertexShaderSource;
-        var vertexShaderInfo;
+        let vertexShader;
+        let vertexShaderSource;
+        let vertexShaderInfo;
 
-        var fragmentShader;
-        var fragmentShaderSource;
-        var fragmentShaderInfo;
+        let fragmentShader;
+        let fragmentShaderSource;
+        let fragmentShaderInfo;
 
-        var shaderProgram;
-        var shaderProgramInfo;
-        var isLinkedProgram;
+        let shaderProgram;
+        let shaderProgramInfo;
+        let isLinkedProgram;
 
-        var shaderAttribs;
-        var shaderUniforms;
+        let shaderAttribs;
+        let shaderUniforms;
 
         //create default render shader if not exist
         if (!OBJModelLoader.RENDER_SHADER) {
@@ -2540,7 +2540,7 @@ var OBJModelLoader = {};
 
                     //get shader material uniforms struct reference
                     shaderUniforms.materials = new Array(64);
-                    for (var i = 0, structure; i < 64; i++) {
+                    for (let i = 0, structure; i < 64; i++) {
                         structure = 'materials[' + i + ']';
                         shaderUniforms.materials[i] = {
                             difuseColor: gl.getUniformLocation(shaderProgram, structure + '.difuseColor'),
@@ -2551,7 +2551,7 @@ var OBJModelLoader = {};
 
                     //get shader ligths uniforms structs reference
                     shaderUniforms.ligths = new Array(8);
-                    for (var i = 0, structure; i < 8; i++) {
+                    for (let i = 0, structure; i < 8; i++) {
                         structure = 'ligths[' + i + ']';
                         shaderUniforms.ligths[i] = {
                             enable: gl.getUniformLocation(shaderProgram, structure + '.enable'),
@@ -2657,7 +2657,7 @@ var OBJModelLoader = {};
     OBJModelLoader.SamplerBuilder.createNewSampler = function (gl, maxSize, useMipmap) {
         maxSize || (maxSize = 4096);
 
-        var workSampler = new Object();
+        let workSampler = new Object();
 
         //define sampler properties
         workSampler.self = this;
@@ -2700,12 +2700,12 @@ var OBJModelLoader = {};
      * @returns {HTMLImage}
      */
     OBJModelLoader.SamplerBuilder.addSamplerImageByURL = function (workSampler, samplerImagePath) {
-        var length = workSampler.images.length;
-        var self = workSampler.self;
+        let length = workSampler.images.length;
+        let self = workSampler.self;
 
-        var i = 0;
-        var found = false;
-        var image = null;
+        let i = 0;
+        let found = false;
+        let image = null;
 
         //search if image has not on cache
         while (!found && i < length) {
@@ -2844,31 +2844,31 @@ var OBJModelLoader = {};
      */
     OBJModelLoader.SamplerBuilder.getRectangle = function (rectangles, rectangleR) {
 
-        var length = rectangles.length;
+        let length = rectangles.length;
 
-        var rectangleA = null;  //rectangle with avaliable space
-        var rectangleB = null;  //rectangle with residual space
-        var rectangleT = null;  //array iterator rectangle 
+        let rectangleA = null;  //rectangle with avaliable space
+        let rectangleB = null;  //rectangle with residual space
+        let rectangleT = null;  //array iterator rectangle 
 
-        var restW = 0, restH = 0;
+        let restW = 0, restH = 0;
 
-        var rectangleArea = 0;
-        var rectangleRigth = 0;
-        var rectangleUp = 0;
+        let rectangleArea = 0;
+        let rectangleRigth = 0;
+        let rectangleUp = 0;
 
-        var minorArea = 0;
-        var minorRigth = 0;
-        var minorUp = 0;
+        let minorArea = 0;
+        let minorRigth = 0;
+        let minorUp = 0;
 
-        var hasMinorRigth = false;
-        var hasMinorUp = false;
+        let hasMinorRigth = false;
+        let hasMinorUp = false;
 
-        var isReducedVerticaly = false;
-        var indexRectangleA = -1;
+        let isReducedVerticaly = false;
+        let indexRectangleA = -1;
 
         //Search one rectangle with avaliable space
         /////////////////////////////////////////////////////
-        for (var i = 0; i < length; i++) {
+        for (let i = 0; i < length; i++) {
             rectangleT = rectangles[i];
 
             //compute unused space betwen two rectangles 
@@ -3047,7 +3047,7 @@ var OBJModelLoader = {};
      * @returns {Number}
      */
     OBJModelLoader.SamplerBuilder.getNexPow2 = function (number) {
-        var value = 1;
+        let value = 1;
 
         //duplicate a value to get one pow of 2 major at number
         while (value < number) {
@@ -3079,22 +3079,22 @@ var OBJModelLoader = {};
      */
     OBJModelLoader.SamplerBuilder.storeSamplerTextures = function (workSampler) {
 
-        var gl = workSampler.gl;
+        let gl = workSampler.gl;
 
-        var images = workSampler.images;
-        var numImages = workSampler.images.length;
-        var image = null;
+        let images = workSampler.images;
+        let numImages = workSampler.images.length;
+        let image = null;
 
-        var area = 0;
-        var maxArea = 0;
-        var maxIndex = 0;
+        let area = 0;
+        let maxArea = 0;
+        let maxIndex = 0;
 
-        var rectangleImage = null;
-        var rectangleRigth = 0;
-        var rectangleUp = 0;
+        let rectangleImage = null;
+        let rectangleRigth = 0;
+        let rectangleUp = 0;
 
-        var samplerWidth = 0;
-        var samplerHeight = 0;
+        let samplerWidth = 0;
+        let samplerHeight = 0;
 
         //build sampler rectangle
         workSampler.length = 0;
@@ -3102,12 +3102,12 @@ var OBJModelLoader = {};
 
         //sort images array by areas (selection sort)
         /////////////////////////////////////////////////////
-        for (var i = 0; i < numImages; i++) {
+        for (let i = 0; i < numImages; i++) {
             image = images[i];
             maxArea = image.width * image.height;
             maxIndex = i;
 
-            for (var j = i + 1; j < numImages; j++) {
+            for (let j = i + 1; j < numImages; j++) {
                 image = images[j];
                 area = image.width * image.height;
 
@@ -3175,7 +3175,7 @@ var OBJModelLoader = {};
 
         //put images on texture
         /////////////////////////////////////////////////////
-        for (var i = 0; i < numImages; i++) {
+        for (let i = 0; i < numImages; i++) {
             image = images[i];
             rectangleImage = image.rectangleImage;
 
@@ -3314,7 +3314,7 @@ var OBJModelLoader = {};
      * @returns {Float32Array[3]}
      */
     OBJModelLoader.Material.Color = function (clonedColor) {
-        var color = new Float32Array(4);
+        let color = new Float32Array(4);
         
         Object.defineProperty(color, 'red', {
             configurable: false,
@@ -3396,7 +3396,7 @@ var OBJModelLoader = {};
      * @returns {Float32Array[4]}
      */
     OBJModelLoader.Material.Sampler = function (clonedSampler) {
-        var sampler = new Float32Array(4);
+        let sampler = new Float32Array(4);
 
         if (clonedSampler) {
             sampler[0] = clonedSampler[0];
@@ -3520,9 +3520,9 @@ var OBJModelLoader = {};
      * @returns {OBJModelLoader.OBJModel.OBJObject}
      */
     OBJModelLoader.OBJModel.prototype.getOBJObject = function (name) {
-        var found = false;
-        var index = 0;
-        var length = this.objects.length;
+        let found = false;
+        let index = 0;
+        let length = this.objects.length;
 
         while (!found && index < length) {
             found = this.objects[index].name === name;
@@ -3541,9 +3541,9 @@ var OBJModelLoader = {};
      * @returns {OBJModelLoader.Material}
      */
     OBJModelLoader.OBJModel.prototype.getMTLMaterial = function (name) {
-        var found = false;
-        var index = 0;
-        var length = this.materials.length;
+        let found = false;
+        let index = 0;
+        let length = this.materials.length;
 
         while (!found && index < length) {
             found = this.materials[index].name === name;
@@ -3573,24 +3573,24 @@ var OBJModelLoader = {};
             return;
 
         //buffer values
-        var vertexBuffer = this.vertexBuffer;
-        var vertexAttribs = vertexBuffer.vertexAttribs;
-        var indexBuffer = this.indexBuffer;
+        let vertexBuffer = this.vertexBuffer;
+        let vertexAttribs = vertexBuffer.vertexAttribs;
+        let indexBuffer = this.indexBuffer;
 
         //shader elements vars
-        var shaderAttribs = shader.attribs;
-        var shaderUniforms = shader.uniforms;
+        let shaderAttribs = shader.attribs;
+        let shaderUniforms = shader.uniforms;
 
         //attrib asignation vars
-        var vertexStride = vertexBuffer.vertexStride;
-        var vertexAttrib;
-        var shaderAttrib;
+        let vertexStride = vertexBuffer.vertexStride;
+        let vertexAttrib;
+        let shaderAttrib;
 
         //material definition vars
-        var samplers = this.samplers;
-        var materials = this.materials;
-        var materialStructure;
-        var color;
+        let samplers = this.samplers;
+        let materials = this.materials;
+        let materialStructure;
+        let color;
 
         //LINK BUFFER TO ATTRIBs LOCATIONs
         /////////////////////////////////////////////////////////
@@ -3691,14 +3691,14 @@ var OBJModelLoader = {};
 
             //send materials structures data to shader
             //////////////////////////////////////////////////////////
-            for (var i = 0, length = materials.length; i < length; i++) {
+            for (let i = 0, length = materials.length; i < length; i++) {
                 materialStructure = shaderUniforms.materials[i];
                 materialStructure && materials[i].sendToGPU(gl, materialStructure);
             }
 
             //bind and enable requireds textures
             //////////////////////////////////////////////////////////
-            var textureUnit = 0;
+            let textureUnit = 0;
 
             //bind difuse texture map
             if (samplers.difuseSampler && samplers.difuseSampler.initialized) {
@@ -3769,8 +3769,8 @@ var OBJModelLoader = {};
      * @returns {undefined}
      */
     OBJModelLoader.OBJModel.prototype.unprepare = function (gl, shader) {
-        var textureUnit = 0;
-        var samplers;
+        let textureUnit = 0;
+        let samplers;
 
         //Disable used Sampler Maps Textures
         if (shader) {
@@ -3859,28 +3859,28 @@ var OBJModelLoader = {};
     OBJModelLoader.OBJModel.prototype.executeDrawCalls = function (gl, preserveDrawCalls) {
 
         //model buffers
-        var vertexBuffer = this.vertexBuffer;
-        var indexBuffer = this.indexBuffer;
+        let vertexBuffer = this.vertexBuffer;
+        let indexBuffer = this.indexBuffer;
 
         //model resources
-        var shaderUniforms = this.shader.uniforms;
+        let shaderUniforms = this.shader.uniforms;
 
         //model draw vars
-        var vertexsNumber = vertexBuffer.vertexsNumber;
-        var indexsNumber;
-        var indexUnpackFormat;
-        var indexStride;
+        let vertexsNumber = vertexBuffer.vertexsNumber;
+        let indexsNumber;
+        let indexUnpackFormat;
+        let indexStride;
 
         //sub model vars
-        var objects = this.objects;
-        var objectsNumber = objects.length;
-        var objectIndex = -1;
-        var objObject = null;
+        let objects = this.objects;
+        let objectsNumber = objects.length;
+        let objectIndex = -1;
+        let objObject = null;
 
         //draw calls vars
-        var drawCalls = this.drawCalls;
-        var drawCallsNumber = this.drawCallsNumber;
-        var instance = null;
+        let drawCalls = this.drawCalls;
+        let drawCallsNumber = this.drawCallsNumber;
+        let instance = null;
 
         //draw prepared model 
         if (this.prepared) {
@@ -3893,7 +3893,7 @@ var OBJModelLoader = {};
 
                 //draw each instance call's
                 //////////////////////////////////////////////////////////
-                for (var i = 0; i < drawCallsNumber; i++) {
+                for (let i = 0; i < drawCallsNumber; i++) {
                     instance = drawCalls[i];
                     objectIndex = instance ? instance.objObjectIndex : objectsNumber;
 
@@ -3931,7 +3931,7 @@ var OBJModelLoader = {};
 
                 //draw each instance call's
                 //////////////////////////////////////////////////////////
-                for (var i = 0; i < drawCallsNumber; i++) {
+                for (let i = 0; i < drawCallsNumber; i++) {
                     instance = drawCalls[i];
                     objectIndex = instance ? instance.objObjectIndex : objectsNumber;
 
@@ -3981,8 +3981,8 @@ var OBJModelLoader = {};
      * @returns {undefined}
      */
     OBJModelLoader.OBJModel.prototype.draw = function (gl, drawMode) {
-        var vertexBuffer = this.vertexBuffer;
-        var indexBuffer = this.indexBuffer;
+        let vertexBuffer = this.vertexBuffer;
+        let indexBuffer = this.indexBuffer;
 
         if (this.indexBuffer)
             gl.drawElements(drawMode || gl.TRIANGLES, indexBuffer.indexsNumber, indexBuffer.indexUnpackFormat, 0);
@@ -4003,9 +4003,9 @@ var OBJModelLoader = {};
      * @returns {undefined}
      */
     OBJModelLoader.OBJModel.prototype.drawOBJObject = function (gl, index, drawMode) {
-        var objects = this.objects;
-        var objObject = null;
-
+        let objects = this.objects;
+        let objObject = null;
+        
         if (index > 0 && index < objects.length) {
             objObject = objects[index];
 
@@ -4153,9 +4153,9 @@ var OBJModelLoader = {};
      * @returns {undefined}
      */
     OBJModelLoader.OBJModel.Instance.prototype.setCoords = function (x, y, z) {
-        this.transformMatrix[12] = x;
-        this.transformMatrix[13] = y;
-        this.transformMatrix[14] = z;
+        x && (this.transformMatrix[12] = x);
+        y && (this.transformMatrix[13] = y);
+        z && (this.transformMatrix[14] = z);
     };
 
     /**
@@ -4167,7 +4167,7 @@ var OBJModelLoader = {};
      * @returns {undefined}
      */
     OBJModelLoader.OBJModel.Instance.prototype.draw = function (gl) {
-        var model = this.model;
+        let model = this.model;
 
         //send matrix's to shader
         gl.uniformMatrix4fv(model.shader.uniforms.mtransform, false, this.transformMatrix);
@@ -4180,7 +4180,7 @@ var OBJModelLoader = {};
             model.drawSubmodel(gl, this.subModelIndex, this.drawMode);
 
     };
-
+    
     /**
      * @description
      * Add to model one new required draw call
